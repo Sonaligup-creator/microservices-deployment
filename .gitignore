@@ -1,0 +1,16 @@
+node_modules
+.env
+.env.local
+.next
+/common
+
+# ignore google cloud relavent files
+infra
+infra/
+infra/k8s
+infra/k8s/
+client/api/build-client.js
+# *.yaml
+infra/k8s/client-depl.yaml
+.DS_Store
+.vscode
