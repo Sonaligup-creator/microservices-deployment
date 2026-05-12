@@ -1,0 +1,310 @@
+# Azure DevOps Pipeline: Deploy to AKS with MongoDB Atlas
+# This is a snippet showing the key stages to add to your app deployment pipeline
+
+# Prerequisites:
+# - Terraform apply pipeline has run and created AKS, ACR, Key Vault
+# - MongoDB Atlas cluster is provisioned and connection string is available
+# - Variable group "Mongo-secrets" exists with: mongo-connection-string, mongodb-api-key, jwt_key
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - client/**
+      - order/**
+      - payment/**
+      - product/**
+      - user/**
+      - expiration/**
+      - infra/k8s/**
+
+variables:
+  - group: Mongo-secrets
+  - name: azureSubscription
+    value: 'sc-azure-terraform'
+  - name: acrLoginServer
+    value: '$(ACR_LOGIN_SERVER)'
+  - name: aksClusterName
+    value: '$(AKS_CLUSTER_NAME)'
+  - name: aksResourceGroup
+    value: '$(RESOURCE_GROUP_NAME)'
+  - name: containerRegistry
+    value: '$(acrLoginServer)'
+  - name: kubernetesNamespace
+    value: 'production'
+
+stages:
+  # ====== STAGE 1: Build & Push Images to ACR ======
+  - stage: BuildAndPush
+    displayName: 'Build & Push Images to ACR'
+    jobs:
+      - job: BuildImages
+        displayName: 'Build Docker Images'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          # Log in to ACR
+          - task: Docker@2
+            displayName: 'Log in to ACR'
+            inputs:
+              command: 'login'
+              containerRegistry: 'acr-service-connection'  # Update with your ACR service connection name
+
+          # Build and push each service image
+          - task: Docker@2
+            displayName: 'Build and Push Product Service'
+            inputs:
+              command: 'buildAndPush'
+              repository: '$(acrLoginServer)/product'
+              dockerfile: 'product/Dockerfile'
+              containerRegistry: 'acr-service-connection'
+              tags: |
+                latest
+                $(Build.BuildId)
+
+          - task: Docker@2
+            displayName: 'Build and Push Order Service'
+            inputs:
+              command: 'buildAndPush'
+              repository: '$(acrLoginServer)/order'
+              dockerfile: 'order/Dockerfile'
+              containerRegistry: 'acr-service-connection'
+              tags: |
+                latest
+                $(Build.BuildId)
+
+          - task: Docker@2
+            displayName: 'Build and Push User Service'
+            inputs:
+              command: 'buildAndPush'
+              repository: '$(acrLoginServer)/user'
+              dockerfile: 'user/Dockerfile'
+              containerRegistry: 'acr-service-connection'
+              tags: |
+                latest
+                $(Build.BuildId)
+
+          - task: Docker@2
+            displayName: 'Build and Push Payment Service'
+            inputs:
+              command: 'buildAndPush'
+              repository: '$(acrLoginServer)/payment'
+              dockerfile: 'payment/Dockerfile'
+              containerRegistry: 'acr-service-connection'
+              tags: |
+                latest
+                $(Build.BuildId)
+
+          - task: Docker@2
+            displayName: 'Build and Push Client (Next.js)'
+            inputs:
+              command: 'buildAndPush'
+              repository: '$(acrLoginServer)/client'
+              dockerfile: 'client/Dockerfile'
+              containerRegistry: 'acr-service-connection'
+              tags: |
+                latest
+                $(Build.BuildId)
+
+          - task: Docker@2
+            displayName: 'Build and Push Expiration Service'
+            inputs:
+              command: 'buildAndPush'
+              repository: '$(acrLoginServer)/expiration'
+              dockerfile: 'expiration/Dockerfile'
+              containerRegistry: 'acr-service-connection'
+              tags: |
+                latest
+                $(Build.BuildId)
+
+  # ====== STAGE 2: Create Kubernetes Secrets ======
+  - stage: CreateSecrets
+    displayName: 'Create Kubernetes Secrets'
+    dependsOn: BuildAndPush
+    jobs:
+      - deployment: DeploySecrets
+        displayName: 'Deploy Secrets to AKS'
+        environment: 'production'
+        pool:
+          vmImage: 'ubuntu-latest'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                # Get AKS credentials
+                - task: AzureCLI@2
+                  displayName: 'Get AKS Credentials'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az aks get-credentials \
+                        --resource-group $(aksResourceGroup) \
+                        --name $(aksClusterName) \
+                        --admin \
+                        --overwrite-existing
+
+                # Create mongo-secret from MongoDB Atlas connection string
+                - task: AzureCLI@2
+                  displayName: 'Create mongo-secret'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      # Create mongo-secret with all service database URIs pointing to Atlas
+                      kubectl create secret generic mongo-secret \
+                        --from-literal=MONGO_URI_PRODUCT="$(mongo-connection-string)" \
+                        --from-literal=MONGO_URI_ORDER="$(mongo-connection-string)" \
+                        --from-literal=MONGO_URI_USER="$(mongo-connection-string)" \
+                        --from-literal=MONGO_URI_PAYMENT="$(mongo-connection-string)" \
+                        --namespace $(kubernetesNamespace) \
+                        --dry-run=client -o yaml | kubectl apply -f -
+
+                      echo "✓ mongo-secret created/updated"
+
+                # Create jwt-secret
+                - task: AzureCLI@2
+                  displayName: 'Create jwt-secret'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      kubectl create secret generic jwt-secret \
+                        --from-literal=JWT_KEY="$(jwt_key)" \
+                        --namespace $(kubernetesNamespace) \
+                        --dry-run=client -o yaml | kubectl apply -f -
+
+                      echo "✓ jwt-secret created/updated"
+
+                # Verify secrets
+                - task: AzureCLI@2
+                  displayName: 'Verify Secrets'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      echo "Secrets in cluster:"
+                      kubectl get secrets -n $(kubernetesNamespace)
+
+  # ====== STAGE 3: Deploy Microservices ======
+  - stage: DeployServices
+    displayName: 'Deploy Microservices to AKS'
+    dependsOn: CreateSecrets
+    jobs:
+      - job: PrepareDeployment
+        displayName: 'Prepare Manifests'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+
+          # Update image references in k8s manifests to use ACR
+          - task: Bash@3
+            displayName: 'Update K8s Manifests with ACR Images'
+            inputs:
+              targetType: 'inline'
+              script: |
+                # Replace placeholder image references with ACR login server
+                for file in infra/k8s/*-depl.yaml; do
+                  # Skip in-cluster MongoDB manifests
+                  if [[ "$file" == *"-mongo-depl.yaml" ]]; then
+                    continue
+                  fi
+                  
+                  sed -i "s|thasup/product|$(acrLoginServer)/product:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/order|$(acrLoginServer)/order:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/payment|$(acrLoginServer)/payment:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/user|$(acrLoginServer)/user:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/expiration|$(acrLoginServer)/expiration:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/client|$(acrLoginServer)/client:$(Build.BuildId)|g" "$file"
+                done
+                echo "✓ Manifests updated with ACR images"
+
+          # Publish updated manifests as artifact
+          - publish: $(System.DefaultWorkingDirectory)/infra/k8s
+            artifact: k8s-manifests-$(Build.BuildId)
+            displayName: 'Publish Updated Manifests'
+
+      - deployment: DeployApp
+        displayName: 'Deploy to AKS'
+        dependsOn: PrepareDeployment
+        environment: 'production'
+        pool:
+          vmImage: 'ubuntu-latest'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: k8s-manifests-$(Build.BuildId)
+
+                # Get AKS credentials
+                - task: AzureCLI@2
+                  displayName: 'Get AKS Credentials'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az aks get-credentials \
+                        --resource-group $(aksResourceGroup) \
+                        --name $(aksClusterName) \
+                        --admin \
+                        --overwrite-existing
+
+                # Create namespace
+                - task: AzureCLI@2
+                  displayName: 'Create Namespace'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      kubectl create namespace $(kubernetesNamespace) --dry-run=client -o yaml | kubectl apply -f -
+                      echo "✓ Namespace created/verified"
+
+                # Deploy services (skip in-cluster MongoDB)
+                - task: AzureCLI@2
+                  displayName: 'Deploy Microservices'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      MANIFEST_DIR="$(Pipeline.Workspace)/k8s-manifests-$(Build.BuildId)"
+                      
+                      echo "Deploying NATS..."
+                      kubectl apply -f "$MANIFEST_DIR/nats-depl.yaml" -n $(kubernetesNamespace)
+
+                      echo "Deploying Expiration service (Redis)..."
+                      kubectl apply -f "$MANIFEST_DIR/expiration-redis-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/expiration-depl.yaml" -n $(kubernetesNamespace)
+
+                      echo "Deploying microservices..."
+                      kubectl apply -f "$MANIFEST_DIR/product-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/order-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/user-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/payment-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/client-depl.yaml" -n $(kubernetesNamespace)
+
+                      echo "✓ All services deployed"
+
+                # Verify deployments
+                - task: AzureCLI@2
+                  displayName: 'Verify Deployments'
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      echo "Checking deployment status..."
+                      kubectl get deployments -n $(kubernetesNamespace)
+                      kubectl get pods -n $(kubernetesNamespace)
+                      echo "✓ Deployments verified"
