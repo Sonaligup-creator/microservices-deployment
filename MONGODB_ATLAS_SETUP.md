@@ -47,7 +47,7 @@ After Terraform creates the Key Vault, create Kubernetes secrets from the Atlas 
 
 ```bash
 # Retrieve the Atlas connection string from your DevOps variable group or Key Vault
-export MONGO_URI="mongodb+srv://appuser:PASSWORD@cluster0.abcd.mongodb.net/ecommerce?retryWrites=true&w=majority"
+export MONGO_URI="mongo-db-uri"
 export JWT_KEY="your-jwt-secret"
 
 # Create the mongo-secret with all database URIs pointing to Atlas
