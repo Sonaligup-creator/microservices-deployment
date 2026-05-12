@@ -1,5 +1,5 @@
-# Azure DevOps Pipeline: Deploy to AKS with MongoDB Atlas
-# This is a snippet showing the key stages to add to your app deployment pipeline
+# Azure DevOps Pipeline: Microservices Website Deployment to AKS
+# This snippet shows the key stages for deploying a microservices-based website on Kubernetes
 
 # Prerequisites:
 # - Terraform apply pipeline has run and created AKS, ACR, Key Vault
@@ -21,25 +21,39 @@ trigger:
       - expiration/**
       - infra/k8s/**
 
+parameters:
+  - name: azureSubscription
+    displayName: Azure svc conn
+    type: string
+    default: ''
+  - name: acrServiceConnection
+    displayName: ACR svc conn
+    type: string
+    default: ''
+  - name: acrLoginServer
+    displayName: ACR registry
+    type: string
+    default: ''
+  - name: aksClusterName
+    displayName: AKS name
+    type: string
+    default: ''
+  - name: aksResourceGroup
+    displayName: AKS RG
+    type: string
+    default: ''
+  - name: kubernetesNamespace
+    displayName: Namespace
+    type: string
+    default: 'production'
+
 variables:
   - group: Mongo-secrets
-  - name: azureSubscription
-    value: 'sc-azure-terraform'
-  - name: acrLoginServer
-    value: '$(ACR_LOGIN_SERVER)'
-  - name: aksClusterName
-    value: '$(AKS_CLUSTER_NAME)'
-  - name: aksResourceGroup
-    value: '$(RESOURCE_GROUP_NAME)'
-  - name: containerRegistry
-    value: '$(acrLoginServer)'
-  - name: kubernetesNamespace
-    value: 'production'
 
 stages:
-  # ====== STAGE 1: Build & Push Images to ACR ======
+  # ====== STAGE 1: Build & Push Microservice Images to ACR ======
   - stage: BuildAndPush
-    displayName: 'Build & Push Images to ACR'
+    displayName: 'Build and Push Images'
     jobs:
       - job: BuildImages
         displayName: 'Build Docker Images'
@@ -51,16 +65,16 @@ stages:
             displayName: 'Log in to ACR'
             inputs:
               command: 'login'
-              containerRegistry: 'acr-service-connection'  # Update with your ACR service connection name
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
 
           # Build and push each service image
           - task: Docker@2
             displayName: 'Build and Push Product Service'
             inputs:
               command: 'buildAndPush'
-              repository: '$(acrLoginServer)/product'
+              repository: '${{ parameters.acrLoginServer }}/product'
               dockerfile: 'product/Dockerfile'
-              containerRegistry: 'acr-service-connection'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
@@ -69,9 +83,9 @@ stages:
             displayName: 'Build and Push Order Service'
             inputs:
               command: 'buildAndPush'
-              repository: '$(acrLoginServer)/order'
+              repository: '${{ parameters.acrLoginServer }}/order'
               dockerfile: 'order/Dockerfile'
-              containerRegistry: 'acr-service-connection'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
@@ -80,9 +94,9 @@ stages:
             displayName: 'Build and Push User Service'
             inputs:
               command: 'buildAndPush'
-              repository: '$(acrLoginServer)/user'
+              repository: '${{ parameters.acrLoginServer }}/user'
               dockerfile: 'user/Dockerfile'
-              containerRegistry: 'acr-service-connection'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
@@ -91,9 +105,9 @@ stages:
             displayName: 'Build and Push Payment Service'
             inputs:
               command: 'buildAndPush'
-              repository: '$(acrLoginServer)/payment'
+              repository: '${{ parameters.acrLoginServer }}/payment'
               dockerfile: 'payment/Dockerfile'
-              containerRegistry: 'acr-service-connection'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
@@ -102,9 +116,9 @@ stages:
             displayName: 'Build and Push Client (Next.js)'
             inputs:
               command: 'buildAndPush'
-              repository: '$(acrLoginServer)/client'
+              repository: '${{ parameters.acrLoginServer }}/client'
               dockerfile: 'client/Dockerfile'
-              containerRegistry: 'acr-service-connection'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
@@ -113,14 +127,14 @@ stages:
             displayName: 'Build and Push Expiration Service'
             inputs:
               command: 'buildAndPush'
-              repository: '$(acrLoginServer)/expiration'
+              repository: '${{ parameters.acrLoginServer }}/expiration'
               dockerfile: 'expiration/Dockerfile'
-              containerRegistry: 'acr-service-connection'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
 
-  # ====== STAGE 2: Create Kubernetes Secrets ======
+  # ====== STAGE 2: Create Kubernetes Secrets for the Website ======
   - stage: CreateSecrets
     displayName: 'Create Kubernetes Secrets'
     dependsOn: BuildAndPush
@@ -138,13 +152,13 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Get AKS Credentials'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       az aks get-credentials \
-                        --resource-group $(aksResourceGroup) \
-                        --name $(aksClusterName) \
+                        --resource-group ${{ parameters.aksResourceGroup }} \
+                        --name ${{ parameters.aksClusterName }} \
                         --admin \
                         --overwrite-existing
 
@@ -152,7 +166,7 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Create mongo-secret'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
@@ -162,7 +176,7 @@ stages:
                         --from-literal=MONGO_URI_ORDER="$(mongo-connection-string)" \
                         --from-literal=MONGO_URI_USER="$(mongo-connection-string)" \
                         --from-literal=MONGO_URI_PAYMENT="$(mongo-connection-string)" \
-                        --namespace $(kubernetesNamespace) \
+                        --namespace ${{ parameters.kubernetesNamespace }} \
                         --dry-run=client -o yaml | kubectl apply -f -
 
                       echo "✓ mongo-secret created/updated"
@@ -171,13 +185,13 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Create jwt-secret'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       kubectl create secret generic jwt-secret \
                         --from-literal=JWT_KEY="$(jwt_key)" \
-                        --namespace $(kubernetesNamespace) \
+                        --namespace ${{ parameters.kubernetesNamespace }} \
                         --dry-run=client -o yaml | kubectl apply -f -
 
                       echo "✓ jwt-secret created/updated"
@@ -186,16 +200,16 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Verify Secrets'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       echo "Secrets in cluster:"
-                      kubectl get secrets -n $(kubernetesNamespace)
+                      kubectl get secrets -n ${{ parameters.kubernetesNamespace }}
 
-  # ====== STAGE 3: Deploy Microservices ======
+  # ====== STAGE 3: Deploy Microservices to Kubernetes ======
   - stage: DeployServices
-    displayName: 'Deploy Microservices to AKS'
+    displayName: 'Deploy to Kubernetes'
     dependsOn: CreateSecrets
     jobs:
       - job: PrepareDeployment
@@ -218,12 +232,12 @@ stages:
                     continue
                   fi
                   
-                  sed -i "s|thasup/product|$(acrLoginServer)/product:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/order|$(acrLoginServer)/order:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/payment|$(acrLoginServer)/payment:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/user|$(acrLoginServer)/user:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/expiration|$(acrLoginServer)/expiration:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/client|$(acrLoginServer)/client:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/product|${{ parameters.acrLoginServer }}/product:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/order|${{ parameters.acrLoginServer }}/order:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/payment|${{ parameters.acrLoginServer }}/payment:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/user|${{ parameters.acrLoginServer }}/user:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/expiration|${{ parameters.acrLoginServer }}/expiration:$(Build.BuildId)|g" "$file"
+                  sed -i "s|thasup/client|${{ parameters.acrLoginServer }}/client:$(Build.BuildId)|g" "$file"
                 done
                 echo "✓ Manifests updated with ACR images"
 
@@ -249,13 +263,13 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Get AKS Credentials'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       az aks get-credentials \
-                        --resource-group $(aksResourceGroup) \
-                        --name $(aksClusterName) \
+                        --resource-group ${{ parameters.aksResourceGroup }} \
+                        --name ${{ parameters.aksClusterName }} \
                         --admin \
                         --overwrite-existing
 
@@ -263,36 +277,36 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Create Namespace'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
-                      kubectl create namespace $(kubernetesNamespace) --dry-run=client -o yaml | kubectl apply -f -
+                      kubectl create namespace ${{ parameters.kubernetesNamespace }} --dry-run=client -o yaml | kubectl apply -f -
                       echo "✓ Namespace created/verified"
 
                 # Deploy services (skip in-cluster MongoDB)
                 - task: AzureCLI@2
                   displayName: 'Deploy Microservices'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       MANIFEST_DIR="$(Pipeline.Workspace)/k8s-manifests-$(Build.BuildId)"
                       
                       echo "Deploying NATS..."
-                      kubectl apply -f "$MANIFEST_DIR/nats-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/nats-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
 
                       echo "Deploying Expiration service (Redis)..."
-                      kubectl apply -f "$MANIFEST_DIR/expiration-redis-depl.yaml" -n $(kubernetesNamespace)
-                      kubectl apply -f "$MANIFEST_DIR/expiration-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/expiration-redis-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
+                      kubectl apply -f "$MANIFEST_DIR/expiration-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
 
                       echo "Deploying microservices..."
-                      kubectl apply -f "$MANIFEST_DIR/product-depl.yaml" -n $(kubernetesNamespace)
-                      kubectl apply -f "$MANIFEST_DIR/order-depl.yaml" -n $(kubernetesNamespace)
-                      kubectl apply -f "$MANIFEST_DIR/user-depl.yaml" -n $(kubernetesNamespace)
-                      kubectl apply -f "$MANIFEST_DIR/payment-depl.yaml" -n $(kubernetesNamespace)
-                      kubectl apply -f "$MANIFEST_DIR/client-depl.yaml" -n $(kubernetesNamespace)
+                      kubectl apply -f "$MANIFEST_DIR/product-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
+                      kubectl apply -f "$MANIFEST_DIR/order-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
+                      kubectl apply -f "$MANIFEST_DIR/user-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
+                      kubectl apply -f "$MANIFEST_DIR/payment-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
+                      kubectl apply -f "$MANIFEST_DIR/client-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
 
                       echo "✓ All services deployed"
 
@@ -300,11 +314,11 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Verify Deployments'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       echo "Checking deployment status..."
-                      kubectl get deployments -n $(kubernetesNamespace)
-                      kubectl get pods -n $(kubernetesNamespace)
+                      kubectl get deployments -n ${{ parameters.kubernetesNamespace }}
+                      kubectl get pods -n ${{ parameters.kubernetesNamespace }}
                       echo "✓ Deployments verified"
