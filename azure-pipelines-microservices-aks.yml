@@ -25,23 +25,23 @@ parameters:
   - name: azureSubscription
     displayName: Azure svc conn
     type: string
-    default: ''
+    default: 'sc-azure-terraform'
   - name: acrServiceConnection
     displayName: ACR svc conn
     type: string
-    default: ''
+    default: 'acr-service-connection'
   - name: acrLoginServer
     displayName: ACR registry
     type: string
-    default: ''
+    default: 'microservicesdevcin5u6e.azurecr.io'
   - name: aksClusterName
     displayName: AKS name
     type: string
-    default: ''
+    default: 'aks-microservices-dev-cin-5u6e'
   - name: aksResourceGroup
     displayName: AKS RG
     type: string
-    default: ''
+    default: 'rg-microservices-dev-cin-5u6e'
   - name: kubernetesNamespace
     displayName: Namespace
     type: string
