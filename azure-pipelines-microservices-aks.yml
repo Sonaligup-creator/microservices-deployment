@@ -137,38 +137,33 @@ stages:
               script: |
                 set -euo pipefail
                 REGISTRY='${{ parameters.acrLoginServer }}'
-                echo "Updating Dockerfiles to use base image ${REGISTRY}/node:lts"
+                echo "Updating Dockerfiles to use base images from ${REGISTRY}"
                 for df in product/Dockerfile order/Dockerfile payment/Dockerfile user/Dockerfile expiration/Dockerfile client/Dockerfile; do
                   if [ -f "$df" ]; then
-                    sed -i "s|FROM node:lts-alpine|FROM ${REGISTRY}/node:lts|g" "$df" || true
-                    sed -i "s|FROM node:lts|FROM ${REGISTRY}/node:lts|g" "$df" || true
+                    sed -i "s|FROM node:16-alpine|FROM ${REGISTRY}/node:16-alpine|g" "$df" || true
+                    sed -i "s|FROM node:lts-alpine|FROM ${REGISTRY}/node:lts-alpine|g" "$df" || true
+                    sed -i "s|FROM node:lts|FROM ${REGISTRY}/node:lts-alpine|g" "$df" || true
                   fi
                 done
                 echo "✓ Dockerfiles updated"
 
-          # Wait for mirrored base image to appear in ACR
-          - task: AzureCLI@2
-            displayName: 'Wait for base image in ACR'
+          # Verify mirrored base images are available in ACR
+          - task: Bash@3
+            displayName: 'Verify base images in ACR'
             inputs:
-              azureSubscription: ${{ parameters.azureSubscription }}
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
+              targetType: 'inline'
+              script: |
                 set -euo pipefail
                 REGISTRY='${{ parameters.acrLoginServer }}'
-                REGNAME="${REGISTRY%%.azurecr.io}"
-                echo "Waiting for ${REGNAME}/node repository to contain tag 'lts'..."
-                for i in {1..30}; do
-                  if az acr repository show-tags --name "$REGNAME" --repository node --query "[?@=='lts']" -o tsv | grep -q "lts"; then
-                    echo "Found lts tag in ACR"
-                    exit 0
+                echo "Verifying base images exist in ${REGISTRY}"
+                for tag in 16-alpine lts-alpine; do
+                  echo "Checking ${REGISTRY}/node:${tag}..."
+                  if ! docker pull "${REGISTRY}/node:${tag}"; then
+                    echo "##vso[task.logissue type=error]Missing base image ${REGISTRY}/node:${tag} in ACR."
+                    exit 1
                   fi
-                  echo "Not found yet, retrying ($i/30)..."
-                  sleep 5
                 done
-                echo "##vso[task.logissue type=error]Timed out waiting for base image tag 'lts' in ACR."
-                az acr repository show --name "$REGNAME" -o table || true
-                exit 1
+                echo "✓ Base images available in ACR"
 
           # Build and push each service image
           - task: Docker@2
