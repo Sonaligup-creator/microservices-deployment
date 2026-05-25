@@ -77,8 +77,8 @@ stages:
                 REGNAME="${REGISTRY%%.azurecr.io}"
                 echo "Mirroring base image from MCR -> ${REGNAME}/node:lts"
 
-                docker pull mcr.microsoft.com/node/lts
-                docker tag mcr.microsoft.com/node/lts ${REGISTRY}/node:lts
+                docker pull mcr.microsoft.com/node:lts
+                docker tag mcr.microsoft.com/node:lts ${REGISTRY}/node:lts
                 docker push ${REGISTRY}/node:lts
 
                 echo "✓ Base image mirrored to ACR"
