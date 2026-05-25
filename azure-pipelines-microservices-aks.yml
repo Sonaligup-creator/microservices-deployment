@@ -55,6 +55,34 @@ stages:
   - stage: BuildAndPush
     displayName: 'Build and Push Images'
     jobs:
+      - job: MirrorBaseImages
+        displayName: 'Mirror base images to ACR'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          # Login to ACR
+          - task: Docker@2
+            displayName: 'Login to ACR (for base image push)'
+            inputs:
+              command: 'login'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
+
+          - task: Bash@3
+            displayName: 'Pull, tag and push base image to ACR'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                REGISTRY='${{ parameters.acrLoginServer }}'
+                REGNAME="${REGISTRY%%.azurecr.io}"
+                echo "Mirroring base image from MCR -> ${REGNAME}/node:lts"
+
+                docker pull mcr.microsoft.com/node/lts
+                docker tag mcr.microsoft.com/node/lts ${REGNAME}/node:lts
+                docker push ${REGNAME}/node:lts
+
+                echo "✓ Base image mirrored to ACR"
+
       - job: BuildImages
         displayName: 'Build Docker Images'
         pool:
@@ -66,6 +94,23 @@ stages:
             inputs:
               command: 'login'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
+
+          # Replace Dockerfile base image to use mirrored ACR base image
+          - task: Bash@3
+            displayName: 'Point Dockerfiles to ACR base image'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                REGISTRY='${{ parameters.acrLoginServer }}'
+                echo "Updating Dockerfiles to use base image ${REGISTRY}/node:lts"
+                for df in product/Dockerfile order/Dockerfile payment/Dockerfile user/Dockerfile expiration/Dockerfile client/Dockerfile; do
+                  if [ -f "$df" ]; then
+                    sed -i "s|FROM node:lts-alpine|FROM ${REGISTRY}/node:lts|g" "$df" || true
+                    sed -i "s|FROM node:lts|FROM ${REGISTRY}/node:lts|g" "$df" || true
+                  fi
+                done
+                echo "✓ Dockerfiles updated"
 
           # Build and push each service image
           - task: Docker@2
