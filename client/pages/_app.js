@@ -32,7 +32,7 @@ const MyApp = ({ Component, pageProps, currentUser }) => {
   return (
 		<SSRProvider>
 			<Head>
-				<title>Aurapan | Women&apos;s Clothing Online Shop</title>
+				<title>ecommercewebsite.me | Women&apos;s Clothing Online Shop</title>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 			</Head>
 			<Header currentUser={currentUser} {...pageProps} />

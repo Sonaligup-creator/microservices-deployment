@@ -32,7 +32,7 @@ const MobileNavbar = ({
 							<Offcanvas.Title id="offcanvasNavbarLabel">
 								<Link href="/" passHref>
 									<Navbar.Brand className="header-logo text-uppercase">
-										Aurapan
+										ecommercewebsite.me
 									</Navbar.Brand>
 								</Link>
 							</Offcanvas.Title>
@@ -97,7 +97,7 @@ const MobileNavbar = ({
 
 					<Link href="/" passHref>
 						<Navbar.Brand className="header-logo text-uppercase">
-							Aurapan
+							ecommercewebsite.me
 						</Navbar.Brand>
 					</Link>
 

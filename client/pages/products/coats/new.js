@@ -32,7 +32,7 @@ const CoatsNewArrivals = ({ products, currentUser }) => {
   return (
 		<>
 			<Head>
-				<title>New Arrivals Coats | Aurapan</title>
+				<title>New Arrivals Coats | ecommercewebsite.me</title>
 			</Head>
 			{loading
 			  ? (

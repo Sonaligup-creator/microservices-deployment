@@ -155,7 +155,7 @@ const CartPage = ({ currentUser, products }) => {
   return (
 		<>
 			<Head>
-				<title>Cart | Aurapan</title>
+				<title>Cart | ecommercewebsite.me</title>
 			</Head>
 			{storageReady
 			  ? (

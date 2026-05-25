@@ -17,9 +17,9 @@ const SocialShare = ({ product }) => {
   useEffect(() => {
     const message = `I Love this "${
 			product.title
-		}" product on Aurapan Shop! \n visit this lovely shop here! ${
+		}" product on ecommercewebsite.me Shop! \n visit this lovely shop here! ${
 			window.location.protocol !== 'https' ? 'http' : 'https'
-		}://www.aurapan.com/products/${product.id}`;
+		}://www.ecommercewebsite.me/products/${product.id}`;
 
     setShareMsg(message);
   }, []);
@@ -31,7 +31,7 @@ const SocialShare = ({ product }) => {
 				className="ps-0 d-flex flex-row align-items-center justify-content-flex-start"
 			>
 				<FacebookShareButton
-					url={`https://www.aurapan.com/products/${product.id}`}
+					url={`https://www.ecommercewebsite.me/products/${product.id}`}
 					quote={'Be your beautiful best.'}
 					className="me-2"
 				>
@@ -40,14 +40,14 @@ const SocialShare = ({ product }) => {
 
 				<TwitterShareButton
 					url={`${shareMsg}`}
-					hashtags={['lovely', 'dress', 'aurapan', 'shopping']}
+					hashtags={['lovely', 'dress', 'ecommercewebsite.me', 'shopping']}
 					className="me-2"
 				>
 					<TwitterIcon size={32} round={true} />
 				</TwitterShareButton>
 
 				<LineShareButton
-					url={`https://www.aurapan.com/products/${product.id}`}
+					url={`https://www.ecommercewebsite.me/products/${product.id}`}
 					title={'Be your beautiful best.'}
 					className="me-2"
 				>

@@ -158,7 +158,7 @@ const productDetail = ({ products, users, currentUser, myOrders }) => {
   return (
 		<>
 			<Head>
-				<title>{product?.title} | Aurapan</title>
+				<title>{product?.title} | ecommercewebsite.me</title>
 			</Head>
 			<div className="breadcrumb-label">
 				{product?.id !== productId ? (

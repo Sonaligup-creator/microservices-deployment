@@ -30,7 +30,7 @@ const Coats = ({ products, currentUser }) => {
   return (
 		<>
 			<Head>
-				<title>Coats | Aurapan</title>
+				<title>Coats | ecommercewebsite.me</title>
 			</Head>
 			{loading
 			  ? (

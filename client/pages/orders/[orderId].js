@@ -110,7 +110,7 @@ const OrderPage = ({ currentUser, orders, myOrders }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Order | Aurapan</title>
+					<title>Order | ecommercewebsite.me</title>
 				</Head>
 				{loading
 				  ? (

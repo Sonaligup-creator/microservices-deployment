@@ -20,7 +20,7 @@ const signout = () => {
   return (
 		<>
 			<Head>
-				<title>Sign Out | Aurapan</title>
+				<title>Sign Out | ecommercewebsite.me</title>
 			</Head>
 			<div
 				className="d-flex justify-content-center align-items-center px-0"

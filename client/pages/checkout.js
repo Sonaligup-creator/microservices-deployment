@@ -102,7 +102,7 @@ const CheckoutPage = ({ currentUser }) => {
   return (
 			<>
 				<Head>
-					<title>Checkout | Aurapan</title>
+					<title>Checkout | ecommercewebsite.me</title>
 				</Head>
 				{storageReady && (
 					<Container className="app-container">

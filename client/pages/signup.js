@@ -64,7 +64,7 @@ const signup = ({ currentUser }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Sign Up | Aurapan</title>
+					<title>Sign Up | ecommercewebsite.me</title>
 				</Head>
 				{loading
 				  ? (

@@ -28,7 +28,7 @@ const BestSeller = ({ bestseller, currentUser }) => {
 	return (
 		<>
 			<Head>
-				<title>BestSeller | Aurapan</title>
+				<title>BestSeller | ecommercewebsite.me</title>
 			</Head>
 			{loading ? (
 				<div

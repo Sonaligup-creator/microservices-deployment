@@ -58,7 +58,7 @@ const signin = ({ currentUser }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Sign In | Aurapan</title>
+					<title>Sign In | ecommercewebsite.me</title>
 				</Head>
 				{loading
 				  ? (

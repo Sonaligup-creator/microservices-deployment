@@ -53,7 +53,7 @@ const PaymentPage = ({ currentUser }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Payment Method | Aurapan</title>
+					<title>Payment Method | ecommercewebsite.me</title>
 				</Head>
 				<FormContainer>
 					<CheckoutSteps

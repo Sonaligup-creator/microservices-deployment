@@ -30,7 +30,7 @@ const TopsBestseller = ({ bestseller, currentUser }) => {
   return (
 		<>
 			<Head>
-				<title>Bestseller Tops | Aurapan</title>
+				<title>Bestseller Tops | ecommercewebsite.me</title>
 			</Head>
 			{loading
 			  ? (

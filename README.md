@@ -1,8 +1,8 @@
 <!-- Add banner here -->
 
-![Project Preview](docs/aurapan-shop-banner-1.jpg)
+![Project Preview](docs/ecommercewebsite.me-shop-banner-1.jpg)
 
-# Aurapan
+# ecommercewebsite.me
 
 <!-- Describe your project in brief -->
 
@@ -14,11 +14,11 @@
 [![deploy-order](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-order.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-order.yaml)
 [![deploy-payment](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-payment.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-payment.yaml)
 
-Aurapan is a women's clothing e-commerce website that features a fully operational **microservices architecture**. Built on the **Next.js** framework for the client-side, while the server-side is developed with **TypeScript and Express** framework, the website is developed on the **Google Cloud Platform** environment and integrated with automation testing through **GitHub Action** workflows. Deployed on a **DigitalOcean** cluster with a Let's Encrypt certificate, Aurapan delivers a secure and seamless shopping experience.
+ecommercewebsite.me is a women's clothing e-commerce website that features a fully operational **microservices architecture**. Built on the **Next.js** framework for the client-side, while the server-side is developed with **TypeScript and Express** framework, the website is developed on the **Google Cloud Platform** environment and integrated with automation testing through **GitHub Action** workflows. Deployed on a **DigitalOcean** cluster with a Let's Encrypt certificate, ecommercewebsite.me delivers a secure and seamless shopping experience.
 
 # Table of contents
 
-- [Aurapan](#aurapan)
+- [ecommercewebsite.me](#ecommercewebsite.me)
 - [Table of contents](#table-of-contents)
 - [Demo](#demo)
 - [Features](#features)
@@ -48,13 +48,13 @@ The Live demo is currently _**terminated**_ due to the high-cost maintenance for
 
 _You can still run it manually with docker-desktop on your local machine._
 
-<!-- To experience Aurapan, please visit [www.aurapan.com](https://www.aurapan.com/). -->
+<!-- To experience ecommercewebsite.me, please visit [www.ecommercewebsite.me](https://www.ecommercewebsite.me/). -->
 
 # Features
 
 [(Back to top)](#table-of-contents)
 
-Aurapan's features include:
+ecommercewebsite.me's features include:
 
 - A fully operational **microservices-architecture** website with user, product, order, payment, and expiration services completely separated.
 - All user, product, order, and payment data is stored in separate **MongoDB** collections.
@@ -86,11 +86,11 @@ Aurapan's features include:
 
 [(Back to top)](#table-of-contents)
 
-This readme file provides an overview of the usage of the Aurapan website. Here are some instructions on how to use the website's features:
+This readme file provides an overview of the usage of the ecommercewebsite.me website. Here are some instructions on how to use the website's features:
 
 ## Sign up for an account
-1. To create an account, visit the [signup page](https://www.aurapan.com/signup).
-2. Enter your email, password, name, gender, and age (these can be fictional since Aurapan is a fictional store).
+1. To create an account, visit the [signup page](https://www.ecommercewebsite.me/signup).
+2. Enter your email, password, name, gender, and age (these can be fictional since ecommercewebsite.me is a fictional store).
 
 ## Purchase products
 ### Pay with Stripe method (recommended)
@@ -112,7 +112,7 @@ This readme file provides an overview of the usage of the Aurapan website. Here 
 2. Access the dashboard through the management menu in the profile dropdown menu.
 
 ## Add a product to your wishlist
-Unfortunately, this feature is not yet available on Aurapan. 😎
+Unfortunately, this feature is not yet available on ecommercewebsite.me. 😎
 
 ## Perform CRUD operations on the product database (create, update, delete)
 To perform CRUD operations on the product database, you need permission to access this function as an admin.
@@ -264,7 +264,7 @@ kubectl create secret generic mongo-secret \
 "--from-literal=MONGO_URI_PAYMENT=<YOUR_MONGO_DB_URI>"
 ```
 
-Example for YOUR_MONGO_DB_URI: `mongodb+srv://admin:<password>@aurapan.ygmpl.mongodb.net/<your_database_name>?retryWrites=true&w=majority`
+Example for YOUR_MONGO_DB_URI: `mongodb+srv://admin:<password>@ecommercewebsite.me.ygmpl.mongodb.net/<your_database_name>?retryWrites=true&w=majority`
 
 **JWT_KEY : --whatever you want--**
 ```

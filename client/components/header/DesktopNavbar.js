@@ -34,7 +34,7 @@ const DesktopNavbar = ({
 				>
 					<Link href="/" passHref>
 						<Navbar.Brand className="header-logo text-uppercase">
-							Aurapan
+							ecommercewebsite.me
 						</Navbar.Brand>
 					</Link>
 

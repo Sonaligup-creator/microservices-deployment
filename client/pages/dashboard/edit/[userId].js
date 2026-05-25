@@ -91,7 +91,7 @@ const UserEdit = ({ users, currentUser }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Edit User Information | Aurapan</title>
+					<title>Edit User Information | ecommercewebsite.me</title>
 				</Head>
 				{loading
 				  ? (

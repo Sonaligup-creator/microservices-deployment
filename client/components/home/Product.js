@@ -41,7 +41,7 @@ const Product = ({
   };
 
   const myLoader = ({ src, quality }) => {
-    const isCloudinary = src.includes('aurapan');
+    const isCloudinary = src.includes('ecommercewebsite.me');
     if (isCloudinary) {
       return `https://res.cloudinary.com/thasup/image/upload/q_${quality || 60}/${src}`;
     } else {

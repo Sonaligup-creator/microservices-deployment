@@ -30,7 +30,7 @@ const SetsBestseller = ({ bestseller, currentUser }) => {
   return (
 		<>
 			<Head>
-				<title>Bestseller Sets | Aurapan</title>
+				<title>Bestseller Sets | ecommercewebsite.me</title>
 			</Head>
 			{loading
 			  ? (

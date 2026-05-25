@@ -52,7 +52,7 @@ const Dashboard = ({ currentUser, users, myOrders, myReviews, products }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Account Setting | Aurapan</title>
+					<title>Account Setting | ecommercewebsite.me</title>
 				</Head>
 
 				<Container className="app-container admin-dashboard">

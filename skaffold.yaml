@@ -11,12 +11,12 @@ build:
     push: false
   # uncomment this if you want to run on google cloud platform
   # googleCloudBuild:
-  #   projectId: aurapan-shop-367317
+  #   projectId: ecommercewebsite.me-shop-367317
   artifacts:
     # uncomment this if you want to run on docker desktop
     - image: thasup/user
     # uncomment this if you want to run on google cloud platform
-    # - image: us.gcr.io/aurapan-shop-367317/user
+    # - image: us.gcr.io/ecommercewebsite.me-shop-367317/user
       context: user
       docker:
         dockerfile: Dockerfile
@@ -27,7 +27,7 @@ build:
     # uncomment this if you want to run on docker desktop
     - image: thasup/client
     # uncomment this if you want to run on google cloud platform
-    # - image: us.gcr.io/aurapan-shop-367317/client
+    # - image: us.gcr.io/ecommercewebsite.me-shop-367317/client
       context: client
       docker:
         dockerfile: dev.Dockerfile
@@ -44,7 +44,7 @@ build:
     # uncomment this if you want to run on docker desktop
     - image: thasup/product
     # uncomment this if you want to run on google cloud platform
-    # - image: us.gcr.io/aurapan-shop-367317/product
+    # - image: us.gcr.io/ecommercewebsite.me-shop-367317/product
       context: product
       docker:
         dockerfile: Dockerfile
@@ -55,7 +55,7 @@ build:
     # uncomment this if you want to run on docker desktop
     - image: thasup/order
     # uncomment this if you want to run on google cloud platform
-    # - image: us.gcr.io/aurapan-shop-367317/order
+    # - image: us.gcr.io/ecommercewebsite.me-shop-367317/order
       context: order
       docker:
         dockerfile: Dockerfile
@@ -66,7 +66,7 @@ build:
     # uncomment this if you want to run on docker desktop
     - image: thasup/expiration
     # uncomment this if you want to run on google cloud platform
-    # - image: us.gcr.io/aurapan-shop-367317/expiration
+    # - image: us.gcr.io/ecommercewebsite.me-shop-367317/expiration
       context: expiration
       docker:
         dockerfile: Dockerfile
@@ -77,7 +77,7 @@ build:
     # uncomment this if you want to run on docker desktop
     - image: thasup/payment
     # uncomment this if you want to run on google cloud platform
-    # - image: us.gcr.io/aurapan-shop-367317/payment
+    # - image: us.gcr.io/ecommercewebsite.me-shop-367317/payment
       context: payment
       docker:
         dockerfile: Dockerfile

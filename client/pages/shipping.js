@@ -71,7 +71,7 @@ const ShippingPage = ({ currentUser }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Shipping Address | Aurapan</title>
+					<title>Shipping Address | ecommercewebsite.me</title>
 				</Head>
 				{storageReady
 				  ? (

@@ -101,7 +101,7 @@ const EditProduct = ({ products, currentUser }) => {
     isReady && (
 			<>
 				<Head>
-					<title>Edit Product Information | Aurapan</title>
+					<title>Edit Product Information | ecommercewebsite.me</title>
 				</Head>
 				{loading
 				  ? (
