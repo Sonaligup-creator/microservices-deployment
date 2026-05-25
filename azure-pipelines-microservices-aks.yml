@@ -590,3 +590,41 @@ stages:
                         | xargs -r kubectl delete pod -n ${{ parameters.kubernetesNamespace }} --ignore-not-found
 
                       echo "✓ Deployments verified"
+
+                # Print access URL (Ingress or ingress-nginx LB)
+                - task: AzureCLI@2
+                  displayName: 'Show Website URL'
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      set -euo pipefail
+                      ns='${{ parameters.kubernetesNamespace }}'
+                      echo "Resolving external access URL in namespace ${ns}..."
+
+                      ingress_ip=$(kubectl get ingress -n "${ns}" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+                      if [ -z "${ingress_ip}" ]; then
+                        ingress_ip=$(kubectl get ingress -n "${ns}" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+                      fi
+
+                      if [ -n "${ingress_ip}" ]; then
+                        echo "Website URL: http://${ingress_ip}"
+                        echo "##vso[task.setvariable variable=WebsiteUrl]http://${ingress_ip}"
+                        exit 0
+                      fi
+
+                      lb_ip=$(kubectl get svc -n ingress-nginx -l app.kubernetes.io/component=controller \
+                        -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+                      if [ -z "${lb_ip}" ]; then
+                        lb_ip=$(kubectl get svc -n ingress-nginx -l app.kubernetes.io/component=controller \
+                          -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+                      fi
+
+                      if [ -n "${lb_ip}" ]; then
+                        echo "Website URL: http://${lb_ip}"
+                        echo "##vso[task.setvariable variable=WebsiteUrl]http://${lb_ip}"
+                        exit 0
+                      fi
+
+                      echo "No Ingress IP/hostname found yet. Use: kubectl get ingress -n ${ns}"
