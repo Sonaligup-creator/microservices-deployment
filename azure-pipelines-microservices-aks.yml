@@ -46,6 +46,14 @@ parameters:
     displayName: Namespace
     type: string
     default: 'production'
+  - name: ingressHost
+    displayName: Ingress host (domain)
+    type: string
+    default: 'www.ecommercewebsite.me'
+  - name: certEmail
+    displayName: Cert-manager email
+    type: string
+    default: 'sonaligup2000@gmail.com'
 
 variables:
   - group: Mongo-secrets
@@ -443,6 +451,46 @@ stages:
                 done
                 echo "✓ Manifests updated with ACR images"
 
+          # Set Ingress host if provided
+          - task: Bash@3
+            displayName: 'Update Ingress Host'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                host='${{ parameters.ingressHost }}'
+                if [ -z "$host" ]; then
+                  echo "Ingress host not set; skipping ingress host update."
+                  exit 0
+                fi
+                if [ -f infra/k8s/ingress-srv.yaml ]; then
+                  tls_secret="tls-$(echo "$host" | tr '.' '-')"
+                  sed -i "s|REPLACE_ME_HOST|${host}|g" infra/k8s/ingress-srv.yaml
+                  sed -i "s|REPLACE_ME_TLS_SECRET|${tls_secret}|g" infra/k8s/ingress-srv.yaml
+                  echo "✓ Ingress host set to ${host}"
+                else
+                  echo "No ingress manifest found; skipping."
+                fi
+
+          # Set cert-manager email if provided
+          - task: Bash@3
+            displayName: 'Update Cert-Manager Email'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                email='${{ parameters.certEmail }}'
+                if [ -z "$email" ]; then
+                  echo "Cert email not set; skipping cert-manager issuer update."
+                  exit 0
+                fi
+                if [ -f infra/k8s/cert-manager-issuer.yaml ]; then
+                  sed -i "s|REPLACE_ME_EMAIL|${email}|g" infra/k8s/cert-manager-issuer.yaml
+                  echo "✓ Cert-manager email set"
+                else
+                  echo "No cert-manager issuer manifest found; skipping."
+                fi
+
           # Validate rewritten images before publishing manifests
           - task: Bash@3
             displayName: 'Validate Rewritten Manifest Images'
@@ -564,6 +612,26 @@ stages:
                       kubectl apply -f "$MANIFEST_DIR/payment-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
                       kubectl apply -f "$MANIFEST_DIR/client-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
 
+                      if [ -n "${{ parameters.ingressHost }}" ] && [ -f "$MANIFEST_DIR/ingress-srv.yaml" ]; then
+                        echo "Installing cert-manager (if needed)..."
+                        if ! kubectl get ns cert-manager >/dev/null 2>&1; then
+                          kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.13.3/cert-manager.yaml
+                          kubectl rollout status deploy/cert-manager -n cert-manager --timeout=300s
+                          kubectl rollout status deploy/cert-manager-webhook -n cert-manager --timeout=300s
+                          kubectl rollout status deploy/cert-manager-cainjector -n cert-manager --timeout=300s
+                        fi
+
+                        if [ -n "${{ parameters.certEmail }}" ] && [ -f "$MANIFEST_DIR/cert-manager-issuer.yaml" ]; then
+                          echo "Applying cert-manager ClusterIssuer..."
+                          kubectl apply -f "$MANIFEST_DIR/cert-manager-issuer.yaml"
+                        fi
+
+                        echo "Deploying Ingress..."
+                        kubectl apply -f "$MANIFEST_DIR/ingress-srv.yaml" -n ${{ parameters.kubernetesNamespace }}
+                      else
+                        echo "Ingress host not provided or ingress manifest missing; skipping ingress apply."
+                      fi
+
                       echo "✓ All services deployed"
 
                 # Verify deployments
@@ -602,6 +670,11 @@ stages:
                       set -euo pipefail
                       ns='${{ parameters.kubernetesNamespace }}'
                       echo "Resolving external access URL in namespace ${ns}..."
+
+                      if [ -n "${{ parameters.ingressHost }}" ]; then
+                        echo "Website URL (host): http://${{ parameters.ingressHost }}"
+                        echo "##vso[task.setvariable variable=WebsiteUrl]http://${{ parameters.ingressHost }}"
+                      fi
 
                       ingress_ip=$(kubectl get ingress -n "${ns}" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
                       if [ -z "${ingress_ip}" ]; then
