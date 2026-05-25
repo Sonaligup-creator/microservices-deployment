@@ -78,12 +78,13 @@ stages:
                 echo "Mirroring base image from MCR -> ${REGNAME}/node:lts"
 
                 docker pull mcr.microsoft.com/node/lts
-                docker tag mcr.microsoft.com/node/lts ${REGNAME}/node:lts
-                docker push ${REGNAME}/node:lts
+                docker tag mcr.microsoft.com/node/lts ${REGISTRY}/node:lts
+                docker push ${REGISTRY}/node:lts
 
                 echo "✓ Base image mirrored to ACR"
 
       - job: BuildImages
+        dependsOn: MirrorBaseImages
         displayName: 'Build Docker Images'
         pool:
           vmImage: 'ubuntu-latest'
@@ -111,6 +112,30 @@ stages:
                   fi
                 done
                 echo "✓ Dockerfiles updated"
+
+          # Wait for mirrored base image to appear in ACR
+          - task: AzureCLI@2
+            displayName: 'Wait for base image in ACR'
+            inputs:
+              azureSubscription: ${{ parameters.azureSubscription }}
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -euo pipefail
+                REGISTRY='${{ parameters.acrLoginServer }}'
+                REGNAME="${REGISTRY%%.azurecr.io}"
+                echo "Waiting for ${REGNAME}/node repository to contain tag 'lts'..."
+                for i in {1..30}; do
+                  if az acr repository show-tags --name "$REGNAME" --repository node --query "[?@=='lts']" -o tsv | grep -q "lts"; then
+                    echo "Found lts tag in ACR"
+                    exit 0
+                  fi
+                  echo "Not found yet, retrying ($i/30)..."
+                  sleep 5
+                done
+                echo "##vso[task.logissue type=error]Timed out waiting for base image tag 'lts' in ACR."
+                az acr repository show --name "$REGNAME" -o table || true
+                exit 1
 
           # Build and push each service image
           - task: Docker@2
