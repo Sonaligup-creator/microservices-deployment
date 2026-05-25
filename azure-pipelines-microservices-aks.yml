@@ -33,15 +33,15 @@ parameters:
   - name: acrLoginServer
     displayName: ACR registry
     type: string
-    default: 'microservicesdevcin5u6e.azurecr.io'
+    default: 'microservicesdevcinjd6s.azurecr.io'
   - name: aksClusterName
     displayName: AKS name
     type: string
-    default: 'aks-microservices-dev-cin-5u6e'
+    default: 'aks-microservices-dev-cin-jd6s'
   - name: aksResourceGroup
     displayName: AKS RG
     type: string
-    default: 'rg-microservices-dev-cin-5u6e'
+    default: 'rg-microservices-dev-cin-jd6s'
   - name: kubernetesNamespace
     displayName: Namespace
     type: string
