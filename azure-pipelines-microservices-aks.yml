@@ -148,6 +148,24 @@ stages:
           runOnce:
             deploy:
               steps:
+                # Ensure namespace exists before creating secrets
+                - task: AzureCLI@2
+                  displayName: 'Create Namespace'
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      set -euo pipefail
+                      az aks get-credentials \
+                        --resource-group ${{ parameters.aksResourceGroup }} \
+                        --name ${{ parameters.aksClusterName }} \
+                        --admin \
+                        --overwrite-existing
+
+                      kubectl create namespace ${{ parameters.kubernetesNamespace }} --dry-run=client -o yaml | kubectl apply -f -
+                      echo "✓ Namespace created/verified"
+
                 # Get AKS credentials
                 - task: AzureCLI@2
                   displayName: 'Get AKS Credentials'
@@ -156,6 +174,7 @@ stages:
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
+                      set -euo pipefail
                       az aks get-credentials \
                         --resource-group ${{ parameters.aksResourceGroup }} \
                         --name ${{ parameters.aksClusterName }} \
@@ -170,6 +189,7 @@ stages:
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
+                      set -euo pipefail
                       # Create mongo-secret with all service database URIs pointing to Atlas
                       kubectl create secret generic mongo-secret \
                         --from-literal=MONGO_URI_PRODUCT="$(mongo-connection-string)" \
@@ -189,6 +209,7 @@ stages:
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
+                      set -euo pipefail
                       kubectl create secret generic jwt-secret \
                         --from-literal=JWT_KEY="$(jwt_key)" \
                         --namespace ${{ parameters.kubernetesNamespace }} \
@@ -204,6 +225,7 @@ stages:
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
+                      set -euo pipefail
                       echo "Secrets in cluster:"
                       kubectl get secrets -n ${{ parameters.kubernetesNamespace }}
 

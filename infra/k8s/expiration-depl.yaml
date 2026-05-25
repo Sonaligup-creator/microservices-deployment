@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expiration
+  template:
+    metadata:
+      labels:
+        app: expiration
+    spec:
+      containers:
+        - name: expiration
+          # uncomment this if you want to run on docker desktop
+          image: thasup/expiration
+          # uncomment this if you want to run on google cloud platform
+          # image: us.gcr.io/aurapan-shop-367317/expiration
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: my-covid-cluster
+            - name: REDIS_HOST
+              value: expiration-redis-srv

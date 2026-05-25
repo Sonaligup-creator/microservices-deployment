@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - name: user
+          # uncomment this if you want to run on docker desktop
+          image: thasup/user
+          # uncomment this if you want to run on google cloud platform
+          # image: us.gcr.io/aurapan-shop-367317/user
+          env:
+            - name: MONGO_URI_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_URI_USER
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-srv
+spec:
+  selector:
+    app: user
+  type: ClusterIP
+  ports:
+    - name: user
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
