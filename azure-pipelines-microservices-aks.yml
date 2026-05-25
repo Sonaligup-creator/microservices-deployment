@@ -255,6 +255,50 @@ stages:
 
                       echo "✓ jwt-secret created/updated"
 
+                # Create stripe-secret (required by payment service)
+                - task: AzureCLI@2
+                  displayName: 'Create stripe-secret'
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      set -euo pipefail
+
+                      if [[ -z "$(stripe_key)" ]]; then
+                        echo "##vso[task.logissue type=error]Pipeline variable stripe_key is empty. Add it in variable group Mongo-secrets."
+                        exit 1
+                      fi
+
+                      kubectl create secret generic stripe-secret \
+                        --from-literal=STRIPE_KEY="$(stripe_key)" \
+                        --namespace ${{ parameters.kubernetesNamespace }} \
+                        --dry-run=client -o yaml | kubectl apply -f -
+
+                      echo "✓ stripe-secret created/updated"
+
+                # Create paypal-secret (required by payment service)
+                - task: AzureCLI@2
+                  displayName: 'Create paypal-secret'
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      set -euo pipefail
+
+                      if [[ -z "$(paypal_client_id)" ]]; then
+                        echo "##vso[task.logissue type=error]Pipeline variable paypal_client_id is empty. Add it in variable group Mongo-secrets."
+                        exit 1
+                      fi
+
+                      kubectl create secret generic paypal-secret \
+                        --from-literal=PAYPAL_CLIENT_ID="$(paypal_client_id)" \
+                        --namespace ${{ parameters.kubernetesNamespace }} \
+                        --dry-run=client -o yaml | kubectl apply -f -
+
+                      echo "✓ paypal-secret created/updated"
+
                 # Verify secrets
                 - task: AzureCLI@2
                   displayName: 'Verify Secrets'
