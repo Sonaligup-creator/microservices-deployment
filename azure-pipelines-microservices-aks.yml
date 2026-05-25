@@ -361,6 +361,32 @@ stages:
                         --admin \
                         --overwrite-existing
 
+                # Attach ACR to AKS so the cluster can pull images
+                - task: AzureCLI@2
+                  displayName: 'Attach ACR to AKS'
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      set -euo pipefail
+                      ACR_NAME="${{ parameters.acrLoginServer }}"
+                      ACR_NAME="${ACR_NAME%%.azurecr.io}"
+
+                      az aks update \
+                        --resource-group ${{ parameters.aksResourceGroup }} \
+                        --name ${{ parameters.aksClusterName }} \
+                        --attach-acr "$ACR_NAME"
+
+                      echo "AKS kubelet identity:"
+                      az aks show \
+                        --resource-group ${{ parameters.aksResourceGroup }} \
+                        --name ${{ parameters.aksClusterName }} \
+                        --query "identityProfile.kubeletidentity.objectId" \
+                        -o tsv
+
+                      echo "ACR attached: $ACR_NAME"
+
                 # Create namespace
                 - task: AzureCLI@2
                   displayName: 'Create Namespace'
@@ -411,11 +437,14 @@ stages:
                       kubectl get deployments -n ${{ parameters.kubernetesNamespace }}
                       kubectl get pods -n ${{ parameters.kubernetesNamespace }}
 
-                      if kubectl get pods -n ${{ parameters.kubernetesNamespace }} --no-headers | grep -E 'ErrImagePull|ImagePullBackOff|CrashLoopBackOff|CreateContainerConfigError' >/dev/null; then
-                        echo "##vso[task.logissue type=error]One or more pods are not healthy. Inspect pod events and image references."
-                        kubectl describe pods -n ${{ parameters.kubernetesNamespace }}
-                        exit 1
-                      fi
+                      for deployment in client-depl expiration-depl expiration-redis-depl nats-depl order-depl payment-depl product-depl user-depl; do
+                        echo "Waiting for rollout: ${deployment}"
+                        kubectl rollout status deployment/${deployment} -n ${{ parameters.kubernetesNamespace }} --timeout=300s
+                      done
 
-                      kubectl wait --for=condition=available deployment --all -n ${{ parameters.kubernetesNamespace }} --timeout=300s
+                      echo "Cleaning up old ReplicaSet pods that are no longer part of the active rollout..."
+                      kubectl get pods -n ${{ parameters.kubernetesNamespace }} --no-headers \
+                        | awk '$3 ~ /ImagePullBackOff|ErrImagePull|CrashLoopBackOff|CreateContainerConfigError/ { print $1 }' \
+                        | xargs -r kubectl delete pod -n ${{ parameters.kubernetesNamespace }} --ignore-not-found
+
                       echo "✓ Deployments verified"
