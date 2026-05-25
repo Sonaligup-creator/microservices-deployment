@@ -72,7 +72,7 @@ stages:
             displayName: 'Build and Push Product Service'
             inputs:
               command: 'buildAndPush'
-              repository: '${{ parameters.acrLoginServer }}/product'
+              repository: 'product'
               dockerfile: 'product/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
@@ -83,7 +83,7 @@ stages:
             displayName: 'Build and Push Order Service'
             inputs:
               command: 'buildAndPush'
-              repository: '${{ parameters.acrLoginServer }}/order'
+              repository: 'order'
               dockerfile: 'order/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
@@ -94,7 +94,7 @@ stages:
             displayName: 'Build and Push User Service'
             inputs:
               command: 'buildAndPush'
-              repository: '${{ parameters.acrLoginServer }}/user'
+              repository: 'user'
               dockerfile: 'user/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
@@ -105,7 +105,7 @@ stages:
             displayName: 'Build and Push Payment Service'
             inputs:
               command: 'buildAndPush'
-              repository: '${{ parameters.acrLoginServer }}/payment'
+              repository: 'payment'
               dockerfile: 'payment/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
@@ -116,7 +116,7 @@ stages:
             displayName: 'Build and Push Client (Next.js)'
             inputs:
               command: 'buildAndPush'
-              repository: '${{ parameters.acrLoginServer }}/client'
+              repository: 'client'
               dockerfile: 'client/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
@@ -127,12 +127,50 @@ stages:
             displayName: 'Build and Push Expiration Service'
             inputs:
               command: 'buildAndPush'
-              repository: '${{ parameters.acrLoginServer }}/expiration'
+              repository: 'expiration'
               dockerfile: 'expiration/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
+
+          # Validate pushed images in ACR before deployment starts
+          - task: AzureCLI@2
+            displayName: 'Validate ACR Images'
+            inputs:
+              azureSubscription: ${{ parameters.azureSubscription }}
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                set -euo pipefail
+
+                REGISTRY_NAME="${{ parameters.acrLoginServer }}"
+                REGISTRY_NAME="${REGISTRY_NAME%%.azurecr.io}"
+
+                echo "Validating images in ACR: ${REGISTRY_NAME}"
+                echo "Expected build tag: $(Build.BuildId)"
+
+                az acr repository list --name "$REGISTRY_NAME" -o table
+
+                for repo in product order user payment client expiration; do
+                  echo "--- ${repo} tags ---"
+                  az acr repository show-tags \
+                    --name "$REGISTRY_NAME" \
+                    --repository "$repo" \
+                    --orderby time_desc \
+                    -o table
+
+                  if ! az acr repository show-tags \
+                    --name "$REGISTRY_NAME" \
+                    --repository "$repo" \
+                    --query "[?@=='$(Build.BuildId)']" \
+                    -o tsv | grep -q "$(Build.BuildId)"; then
+                    echo "##vso[task.logissue type=error]Missing build tag $(Build.BuildId) for ${repo} in ACR."
+                    exit 1
+                  fi
+                done
+
+                echo "✓ ACR image validation passed"
 
   # ====== STAGE 2: Create Kubernetes Secrets for the Website ======
   - stage: CreateSecrets
@@ -263,6 +301,34 @@ stages:
                 done
                 echo "✓ Manifests updated with ACR images"
 
+          # Validate rewritten images before publishing manifests
+          - task: Bash@3
+            displayName: 'Validate Rewritten Manifest Images'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+
+                echo "Validating rewritten image references..."
+                echo "Expected registry: ${{ parameters.acrLoginServer }}"
+
+                if grep -RIn "thasup/" infra/k8s/*-depl.yaml; then
+                  echo "##vso[task.logissue type=error]Placeholder image references still exist in manifests."
+                  exit 1
+                fi
+
+                if ! grep -RIn "${{ parameters.acrLoginServer }}" infra/k8s/*-depl.yaml >/dev/null; then
+                  echo "##vso[task.logissue type=error]ACR image references were not written to manifests."
+                  exit 1
+                fi
+
+                for file in infra/k8s/*-depl.yaml; do
+                  echo "--- $file ---"
+                  grep -n "image:" "$file" || true
+                done
+
+                echo "✓ Manifest image validation passed"
+
           # Publish updated manifests as artifact
           - publish: $(System.DefaultWorkingDirectory)/infra/k8s
             artifact: k8s-manifests-$(Build.BuildId)
@@ -340,7 +406,16 @@ stages:
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
+                      set -euo pipefail
                       echo "Checking deployment status..."
                       kubectl get deployments -n ${{ parameters.kubernetesNamespace }}
                       kubectl get pods -n ${{ parameters.kubernetesNamespace }}
+
+                      if kubectl get pods -n ${{ parameters.kubernetesNamespace }} --no-headers | grep -E 'ErrImagePull|ImagePullBackOff|CrashLoopBackOff|CreateContainerConfigError' >/dev/null; then
+                        echo "##vso[task.logissue type=error]One or more pods are not healthy. Inspect pod events and image references."
+                        kubectl describe pods -n ${{ parameters.kubernetesNamespace }}
+                        exit 1
+                      fi
+
+                      kubectl wait --for=condition=available deployment --all -n ${{ parameters.kubernetesNamespace }} --timeout=300s
                       echo "✓ Deployments verified"
