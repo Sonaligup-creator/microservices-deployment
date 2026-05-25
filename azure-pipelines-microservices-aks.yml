@@ -68,20 +68,53 @@ stages:
               containerRegistry: '${{ parameters.acrServiceConnection }}'
 
           - task: Bash@3
-            displayName: 'Pull, tag and push base image to ACR'
+            displayName: 'Pull, tag and push base images to ACR'
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
                 REGISTRY='${{ parameters.acrLoginServer }}'
-                REGNAME="${REGISTRY%%.azurecr.io}"
-                echo "Mirroring base image from MCR -> ${REGNAME}/node:lts"
+                echo "Mirroring required base images to ${REGISTRY}"
 
-                docker pull mcr.microsoft.com/node:lts
-                docker tag mcr.microsoft.com/node:lts ${REGISTRY}/node:lts
-                docker push ${REGISTRY}/node:lts
+                mirror() {
+                  local src="$1"; shift
+                  local acr_tag="$1"; shift
+                  echo "Trying to pull ${src}..."
+                  if docker pull "${src}"; then
+                    echo "Pulled ${src}, tagging -> ${REGISTRY}/${acr_tag}"
+                    docker tag "${src}" "${REGISTRY}/${acr_tag}"
+                    docker push "${REGISTRY}/${acr_tag}"
+                    echo "Mirrored ${src} -> ${REGISTRY}/${acr_tag}"
+                    return 0
+                  else
+                    echo "Failed to pull ${src}"
+                    return 1
+                  fi
+                }
 
-                echo "✓ Base image mirrored to ACR"
+                # List of desired base images (try these sources in order)
+                declare -A candidates
+                candidates["node:16-alpine"]="node:16-alpine"
+                candidates["node:lts-alpine"]="node:lts-alpine"
+
+                for tag in "node:16-alpine" "node:lts-alpine"; do
+                  pushed=false
+                  # try MCR numeric tags for node (without alpine), then Docker Hub explicit
+                  if mirror "mcr.microsoft.com/node:16" "${tag}"; then
+                    pushed=true
+                  elif mirror "mcr.microsoft.com/node:18" "${tag}"; then
+                    pushed=true
+                  elif mirror "docker.io/library/${tag}" "${tag}"; then
+                    pushed=true
+                  fi
+
+                  if [ "$pushed" = false ]; then
+                    echo "##vso[task.logissue type=error]Unable to mirror base image for ${tag}. Tried MCR and Docker Hub sources."
+                    return 1
+                  fi
+                done
+
+                echo "✓ Base images mirrored to ACR"
 
       - job: BuildImages
         dependsOn: MirrorBaseImages
