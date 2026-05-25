@@ -613,6 +613,12 @@ stages:
                       kubectl apply -f "$MANIFEST_DIR/client-depl.yaml" -n ${{ parameters.kubernetesNamespace }}
 
                       if [ -n "${{ parameters.ingressHost }}" ] && [ -f "$MANIFEST_DIR/ingress-srv.yaml" ]; then
+                        echo "Installing ingress-nginx (if needed)..."
+                        if ! kubectl get ns ingress-nginx >/dev/null 2>&1; then
+                          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+                          kubectl rollout status deploy/ingress-nginx-controller -n ingress-nginx --timeout=300s
+                        fi
+
                         echo "Installing cert-manager (if needed)..."
                         if ! kubectl get ns cert-manager >/dev/null 2>&1; then
                           kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.13.3/cert-manager.yaml
