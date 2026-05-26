@@ -40,14 +40,29 @@ const Product = ({
     }
   };
 
-  const myLoader = ({ src, quality }) => {
-    const isCloudinary = src.includes('ecommercewebsite.me');
-    if (isCloudinary) {
-      return `https://res.cloudinary.com/thasup/image/upload/q_${quality || 60}/${src}`;
-    } else {
-      return `https://www.dropbox.com/s/${src}?raw=1&q=${quality || 20}`;
-    }
-  };
+	const myLoader = ({ src, quality }) => {
+		if (src.startsWith('http://') || src.startsWith('https://')) {
+			if (src.includes('dropbox.com')) {
+				let url = src
+					.replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+					.replace('dropbox.com', 'dl.dropboxusercontent.com');
+
+				url = url.replace(/([?&])dl=0(&|$)/, '$1').replace(/([?&])dl=1(&|$)/, '$1');
+				if (!url.includes('raw=1')) {
+					url += url.includes('?') ? '&raw=1' : '?raw=1';
+				}
+				return url;
+			}
+
+			return src;
+		}
+
+		if (src[0] === 'v') {
+			return `https://res.cloudinary.com/thasup/image/upload/q_${quality || 60}/${src}`;
+		}
+
+		return `https://www.dropbox.com/s/${src}?raw=1&q=${quality || 20}`;
+	};
 
   return (
 		<Card className="product-card">
