@@ -50,9 +50,29 @@ MyApp.getInitialProps = async (appContext) => {
   const client = buildClient(appContext.ctx);
   const { data } = await client.get('/api/users/currentuser');
 
-  const { data: products } = await client.get('/api/products');
-  const { data: orderProducts } = await client.get('/api/orders/products');
-  const { data: paymentProducts } = await client.get('/api/payments/products');
+  let products = [];
+  try {
+    const { data: productsData } = await client.get('/api/products');
+    products = productsData;
+  } catch (err) {
+    products = [];
+  }
+
+  let orderProducts = [];
+  try {
+    const { data: orderProductsData } = await client.get('/api/orders/products');
+    orderProducts = orderProductsData;
+  } catch (err) {
+    orderProducts = [];
+  }
+
+  let paymentProducts = [];
+  try {
+    const { data: paymentProductsData } = await client.get('/api/payments/products');
+    paymentProducts = paymentProductsData;
+  } catch (err) {
+    paymentProducts = [];
+  }
 
   let users = [];
   try {
