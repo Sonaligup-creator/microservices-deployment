@@ -225,6 +225,8 @@ stages:
               repository: 'client'
               dockerfile: 'client/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
+              buildArguments: |
+                NEXT_PUBLIC_STRIPE_KEY=$(stripe_publishable_key)
               tags: |
                 latest
                 $(Build.BuildId)

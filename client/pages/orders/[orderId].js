@@ -23,6 +23,8 @@ import ExpireTimer from '../../components/common/ExpireTimer';
 const OrderPage = ({ currentUser, orders, myOrders }) => {
   const { orderId } = useRouter().query;
 
+	const stripeKey = process.env.NEXT_PUBLIC_STRIPE_KEY || '';
+
   const [order, setOrder] = useState(null);
 
   const [isReady, setIsReady] = useState(false);
@@ -364,7 +366,7 @@ const OrderPage = ({ currentUser, orders, myOrders }) => {
 																  setLoadingPay(true);
 																  payOrder({ token: id });
 																}}
-																stripeKey="pk_test_51KYCbpCqypc6uabtXBYVwjkCQxYJ02VlTebqSllPb0Kei5mvKN1brmzIgEeZK371eoKkh7rJxX70lr7wet0VfZjb00PDUgCK7c"
+																stripeKey={stripeKey}
 																amount={order.totalPrice * 100}
 																email={currentUser.email}
 															/>
