@@ -13,6 +13,9 @@
 
 ecommercewebsite.me is a women's clothing e-commerce website that features a fully operational **microservices architecture**. Built on the **Next.js** framework for the client-side, while the server-side is developed with **TypeScript and Express** framework, this deployment uses **Azure DevOps** pipelines to provision Azure resources and deploy to **Azure Kubernetes Service (AKS)** with **Terraform** as IaC. Terraform reference repo: https://github.com/Sonaligup-creator/Terraform-Infra.
 
+Refer Architecture Diagram
+<img width="1600" height="643" alt="Architecture-diagram" src="https://github.com/user-attachments/assets/7c7a4b94-a976-420a-9685-0d60b7eedd36" />
+
 # Table of contents
 
 - [ecommercewebsite.me](#ecommercewebsite.me)
