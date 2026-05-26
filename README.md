@@ -1,11 +1,9 @@
 <!-- Add banner here -->
 
-![Project Preview](docs/ecommercewebsite.me-shop-banner-1.jpg)
+<img width="1918" height="859" alt="image" src="https://github.com/user-attachments/assets/5ec8304e-0e4c-4125-ada2-34b365b5bdc6" />
 
-## Screenshots
 
-![Website Screenshot](docs/website-screenshot.png)
-![Pipeline Screenshot](docs/pipeline-screenshot.png)
+
 
 # ecommercewebsite.me
 
@@ -218,6 +216,8 @@ This deployment uses Terraform for infrastructure provisioning and Azure DevOps 
 1. Provision Azure infrastructure with Terraform: https://github.com/Sonaligup-creator/Terraform-Infra
 2. Use Azure DevOps pipelines to build and push images to ACR.
 3. Deploy manifests to AKS and validate ingress and TLS.
+   <img width="1919" height="925" alt="image" src="https://github.com/user-attachments/assets/2d895612-67d2-4f7e-9e87-adac8a64e4d0" />
+
 
 # Technology
 
