@@ -54,6 +54,10 @@ parameters:
     displayName: Cert-manager email
     type: string
     default: 'sonaligup2000@gmail.com'
+  - name: stripePublishableKey
+    displayName: Stripe publishable key (pk_test_...)
+    type: string
+    default: ''
 
 variables:
   - group: Mongo-secrets
@@ -224,12 +228,12 @@ stages:
               targetType: 'inline'
               script: |
                 if [ -z "${STRIPE_PUBLISHABLE_KEY}" ]; then
-                  echo "##vso[task.logissue type=error]stripe_publishable_key is empty. Add it in variable group Mongo-secrets."
+                  echo "##vso[task.logissue type=error]stripePublishableKey parameter is empty. Set it when running the pipeline."
                   exit 1
                 fi
                 echo "Stripe publishable key present for client build."
             env:
-              STRIPE_PUBLISHABLE_KEY: $(stripe_publishable_key)
+              STRIPE_PUBLISHABLE_KEY: ${{ parameters.stripePublishableKey }}
 
           - task: Bash@3
             displayName: 'Write client .env.production'
@@ -237,7 +241,7 @@ stages:
               targetType: 'inline'
               script: |
                 set -euo pipefail
-                echo "NEXT_PUBLIC_STRIPE_KEY=$(stripe_publishable_key)" > client/.env.production
+                echo "NEXT_PUBLIC_STRIPE_KEY=${{ parameters.stripePublishableKey }}" > client/.env.production
                 echo "✓ client/.env.production written"
 
           - task: Docker@2
@@ -247,7 +251,7 @@ stages:
               repository: 'client'
               dockerfile: 'client/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
-              arguments: --build-arg NEXT_PUBLIC_STRIPE_KEY=$(stripe_publishable_key)
+              arguments: --build-arg NEXT_PUBLIC_STRIPE_KEY=${{ parameters.stripePublishableKey }}
               tags: |
                 latest
                 $(Build.BuildId)
