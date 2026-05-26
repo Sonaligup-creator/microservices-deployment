@@ -218,6 +218,19 @@ stages:
                 latest
                 $(Build.BuildId)
 
+          - task: Bash@3
+            displayName: 'Validate Stripe publishable key for client build'
+            inputs:
+              targetType: 'inline'
+              script: |
+                if [ -z "${STRIPE_PUBLISHABLE_KEY}" ]; then
+                  echo "##vso[task.logissue type=error]stripe_publishable_key is empty. Add it in variable group Mongo-secrets."
+                  exit 1
+                fi
+                echo "Stripe publishable key present for client build."
+            env:
+              STRIPE_PUBLISHABLE_KEY: $(stripe_publishable_key)
+
           - task: Docker@2
             displayName: 'Build and Push Client (Next.js)'
             inputs:
