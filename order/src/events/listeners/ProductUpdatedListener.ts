@@ -29,7 +29,8 @@ export class ProductUpdatedListener extends Listener<ProductUpdatedEvent> {
     const product = await Product.findByEvent(data);
 
     if (product == null) {
-      throw new NotFoundError();
+      msg.ack();
+      return;
     }
 
     product.set({

@@ -13,6 +13,12 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   queueGroupName = QueueGroupNames.PAYMENT_SERVICE;
 
   async onMessage (data: OrderCreatedEvent['data'], msg: Message): Promise<void> {
+    const existingOrder = await Order.findById(data.id);
+    if (existingOrder) {
+      msg.ack();
+      return;
+    }
+
     // Build an order
     const order = Order.build({
       id: data.id,
