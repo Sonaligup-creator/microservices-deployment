@@ -28,7 +28,6 @@ Refer Architecture Diagram
 		- [Pay with the PayPal method](#pay-with-the-paypal-method)
 	- [Receive an order](#receive-an-order)
 	- [Access the admin dashboard](#access-the-admin-dashboard)
-	- [Add a product to your wishlist](#add-a-product-to-your-wishlist)
 	- [Perform CRUD operations on the product database (create, update, delete)](#perform-crud-operations-on-the-product-database-create-update-delete)
 - [Installation](#installation)
 	- [Running on Docker Desktop](#running-on-docker-desktop)
@@ -105,9 +104,6 @@ This readme file provides an overview of the usage of the ecommercewebsite.me we
 ## Access the admin dashboard
 1. To access the admin dashboard, sign in with an admin account.
 2. Access the dashboard through the management menu in the profile dropdown menu.
-
-## Add a product to your wishlist
-Unfortunately, this feature is not yet available on ecommercewebsite.me. 
 
 ## Perform CRUD operations on the product database (create, update, delete)
 To perform CRUD operations on the product database, you need permission to access this function as an admin.
