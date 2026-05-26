@@ -213,10 +213,16 @@ This deployment uses Terraform for infrastructure provisioning and Azure DevOps 
 3. Deploy manifests to AKS and validate ingress and TLS.
    (Short note - for saving Azure portal charges, I may delete the resources temporarily and create back again so you can test this by youreself by implementing on your machine)
    <img width="1919" height="925" alt="image" src="https://github.com/user-attachments/assets/2d895612-67d2-4f7e-9e87-adac8a64e4d0" />
+	 <img width="1919" height="947" alt="image" src="https://github.com/user-attachments/assets/29f326c2-9826-4522-84f7-740a3e88d6ae" />
+	 <img width="1918" height="951" alt="image" src="https://github.com/user-attachments/assets/77e6bb42-8ca0-447c-bea4-ca286596fdf5" />
+
+
 
 ## Sign up for an account
 1. To create an account, visit the url where you have hosted the website 
 2. Enter your email, password, name, gender, and age (these can be fictional since ecommercewebsite.me is a fictional store).
+   <img width="1919" height="961" alt="image" src="https://github.com/user-attachments/assets/b876030d-98fc-4a2b-9e5c-352b14399555" />
+
 
 
 # Technology
