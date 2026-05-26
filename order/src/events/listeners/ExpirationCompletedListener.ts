@@ -18,7 +18,8 @@ export class ExpirationCompletedListener extends Listener<ExpirationCompletedEve
     const order = await Order.findById(data.orderId);
 
     if (order == null) {
-      throw new Error('Order not found');
+      msg.ack();
+      return;
     }
 
     if (order.status === OrderStatus.Completed) {

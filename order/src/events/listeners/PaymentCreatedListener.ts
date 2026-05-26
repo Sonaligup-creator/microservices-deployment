@@ -19,7 +19,8 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
     const order = await Order.findById(data.orderId);
 
     if (order == null) {
-      throw new Error('Order not found');
+      msg.ack();
+      return;
     }
 
     order.set({

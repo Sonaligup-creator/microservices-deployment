@@ -14,6 +14,15 @@ const ProductList = ({ products, orderProducts, paymentProducts }) => {
   const [deleteProductId, setDeleteProductId] = useState(null);
   const [loading, setLoading] = useState(false);
 
+	const findProductVersion = (list, productId) => {
+		if (!Array.isArray(list)) {
+			return null;
+		}
+
+		const match = list.find((item) => item.id === productId);
+		return match?.version ?? null;
+	};
+
   const { doRequest, errors } = useRequest({
     url: `/api/products/${deleteProductId}`,
     method: 'delete',
@@ -93,38 +102,36 @@ const ProductList = ({ products, orderProducts, paymentProducts }) => {
 								<td>{product.numReviews}</td>
 								<td>{product.version}</td>
 								<td>
-									{orderProducts.find(
-									  (orderProduct) => orderProduct.id === product.id
-									).version === product.version
-									  ? (
-										<span style={{ color: 'green' }}>OK</span>
-									    )
-									  : (
-										<span style={{ color: 'red' }}>
-											{
-												orderProducts.find(
-												  (orderProduct) => orderProduct.id === product.id
-												).version
-											}
-										</span>
-									    )}
+									{(() => {
+									  const orderVersion = findProductVersion(
+									    orderProducts,
+									    product.id
+									  );
+									  if (orderVersion == null) {
+									    return <span style={{ color: 'gray' }}>N/A</span>;
+									  }
+									  return orderVersion === product.version ? (
+									    <span style={{ color: 'green' }}>OK</span>
+									  ) : (
+									    <span style={{ color: 'red' }}>{orderVersion}</span>
+									  );
+									})()}
 								</td>
 								<td>
-									{paymentProducts.find(
-									  (paymentProduct) => paymentProduct.id === product.id
-									).version === product.version
-									  ? (
-										<span style={{ color: 'green' }}>OK</span>
-									    )
-									  : (
-										<span style={{ color: 'red' }}>
-											{
-												paymentProducts.find(
-												  (paymentProduct) => paymentProduct.id === product.id
-												).version
-											}
-										</span>
-									    )}
+									{(() => {
+									  const paymentVersion = findProductVersion(
+									    paymentProducts,
+									    product.id
+									  );
+									  if (paymentVersion == null) {
+									    return <span style={{ color: 'gray' }}>N/A</span>;
+									  }
+									  return paymentVersion === product.version ? (
+									    <span style={{ color: 'green' }}>OK</span>
+									  ) : (
+									    <span style={{ color: 'red' }}>{paymentVersion}</span>
+									  );
+									})()}
 								</td>
 								<td>
 									<Link

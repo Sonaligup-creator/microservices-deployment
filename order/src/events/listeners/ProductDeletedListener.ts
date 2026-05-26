@@ -3,7 +3,6 @@ import {
   Subjects,
   Listener,
   type ProductDeletedEvent,
-  NotFoundError,
   QueueGroupNames
 } from '@thasup-dev/common';
 
@@ -17,7 +16,8 @@ export class ProductDeletedListener extends Listener<ProductDeletedEvent> {
     const product = await Product.findByEvent(data);
 
     if (product == null) {
-      throw new NotFoundError();
+      msg.ack();
+      return;
     }
 
     await product.remove();

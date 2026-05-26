@@ -18,7 +18,8 @@ export class OrderUpdatedListener extends Listener<OrderUpdatedEvent> {
 
     // If no order, throw error
     if (order == null) {
-      throw new Error('Order not found');
+      msg.ack();
+      return;
     }
 
     if (order.isPaid === true) {
