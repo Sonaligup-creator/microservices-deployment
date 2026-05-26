@@ -63,7 +63,14 @@ MyApp.getInitialProps = async (appContext) => {
     users = [];
   }
 
-  const { data: bestseller } = await client.get('/api/products/bestseller');
+  let bestseller = [];
+  try {
+    const { data: bestsellerData } = await client.get('/api/products/bestseller');
+    bestseller = bestsellerData;
+  } catch (err) {
+    // If no bestseller products exist yet, the service can return 404.
+    bestseller = [];
+  }
 
   let pageProps = {
     products,
