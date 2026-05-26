@@ -42,11 +42,7 @@ Refer Architecture Diagram
 
 [(Back to top)](#table-of-contents)
 
-The Live demo is currently _**terminated**_ due to the high-cost maintenance for paying Kubernetes cluster to host a microservices website. 😆
-
-_You can still run it manually with docker-desktop on your local machine._
-
-<!-- To experience ecommercewebsite.me, please visit [www.ecommercewebsite.me](https://www.ecommercewebsite.me/). -->
+_You can  run it manually with docker-desktop on your local machine._
 
 # Features
 
@@ -56,6 +52,8 @@ ecommercewebsite.me's features include:
 
 - A fully operational **microservices-architecture** website with user, product, order, payment, and expiration services completely separated.
 - All user, product, order, and payment data is stored in separate **MongoDB** collections.
+  <img width="1919" height="953" alt="image" src="https://github.com/user-attachments/assets/ccaf7131-b3e0-4b0f-b531-229fc99c95a3" />
+
 - User authentication secured by encrypting passwords using **JWT** and cookies.
 - A customer account settings dashboard to update profile information or see all orders.
 - An admin management dashboard with the authority to add, edit, and delete a product, user, or order.
