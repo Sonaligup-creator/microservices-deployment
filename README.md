@@ -74,7 +74,7 @@ ecommercewebsite.me's features include:
   <!-- - Sorting and filtering all products on store (work in process...) -->
 
 	<!--
-	Something might be a bit exaggerated but one certain thing is that I put all my ❤️ into creating this project.
+	Something might be a bit exaggerated but one certain thing is that I put all my into creating this project.
 	happy browsing! 😊
 	-->
 
@@ -101,14 +101,14 @@ This readme file provides an overview of the usage of the ecommercewebsite.me we
 
 ## Receive an order
 1. Only an admin can change an order status to `delivered`.
-2. You will never receive any real products (even if your order has been marked as `delivered`). 😛
+2. You will never receive any real products (even if your order has been marked as `delivered`). 
 
 ## Access the admin dashboard
 1. To access the admin dashboard, sign in with an admin account.
 2. Access the dashboard through the management menu in the profile dropdown menu.
 
 ## Add a product to your wishlist
-Unfortunately, this feature is not yet available on ecommercewebsite.me. 😎
+Unfortunately, this feature is not yet available on ecommercewebsite.me. 
 
 ## Perform CRUD operations on the product database (create, update, delete)
 To perform CRUD operations on the product database, you need permission to access this function as an admin.
@@ -243,5 +243,5 @@ This project is built using the following technologies:
 
 [(Back to top)](#table-of-contents)
 
-All images used in this project are for educational purposes only. 😘
+All images used in this project are for educational purposes only. 
 
