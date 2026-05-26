@@ -231,6 +231,15 @@ stages:
             env:
               STRIPE_PUBLISHABLE_KEY: $(stripe_publishable_key)
 
+          - task: Bash@3
+            displayName: 'Write client .env.production'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                echo "NEXT_PUBLIC_STRIPE_KEY=$(stripe_publishable_key)" > client/.env.production
+                echo "✓ client/.env.production written"
+
           - task: Docker@2
             displayName: 'Build and Push Client (Next.js)'
             inputs:
@@ -238,11 +247,33 @@ stages:
               repository: 'client'
               dockerfile: 'client/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
-              buildArguments: |
-                NEXT_PUBLIC_STRIPE_KEY=$(stripe_publishable_key)
+              arguments: --build-arg NEXT_PUBLIC_STRIPE_KEY=$(stripe_publishable_key)
               tags: |
                 latest
                 $(Build.BuildId)
+
+          - task: Bash@3
+            displayName: 'Verify NEXT_PUBLIC_STRIPE_KEY in client image'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                IMAGE='${{ parameters.acrLoginServer }}/client:$(Build.BuildId)'
+                echo "Inspecting ${IMAGE} for NEXT_PUBLIC_STRIPE_KEY..."
+
+                key_line=$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$IMAGE" | grep '^NEXT_PUBLIC_STRIPE_KEY=' || true)
+                if [ -z "$key_line" ]; then
+                  echo "##vso[task.logissue type=error]NEXT_PUBLIC_STRIPE_KEY not found in client image env."
+                  exit 1
+                fi
+
+                key_value=${key_line#NEXT_PUBLIC_STRIPE_KEY=}
+                if [ -z "$key_value" ]; then
+                  echo "##vso[task.logissue type=error]NEXT_PUBLIC_STRIPE_KEY is empty in client image env."
+                  exit 1
+                fi
+
+                echo "NEXT_PUBLIC_STRIPE_KEY baked into image (last 4): ${key_value: -4}"
 
           - task: Docker@2
             displayName: 'Build and Push Expiration Service'
