@@ -211,6 +211,7 @@ This deployment uses Terraform for infrastructure provisioning and Azure DevOps 
 1. Provision Azure infrastructure with Terraform: https://github.com/Sonaligup-creator/Terraform-Infra
 2. Use Azure DevOps pipelines to build and push images to ACR.
 3. Deploy manifests to AKS and validate ingress and TLS.
+   (Short note - for saving Azure portal charges, I may delete the resources temporarily and create back again so you can test this by youreself by implementing on your machine)
    <img width="1919" height="925" alt="image" src="https://github.com/user-attachments/assets/2d895612-67d2-4f7e-9e87-adac8a64e4d0" />
 
 ## Sign up for an account
