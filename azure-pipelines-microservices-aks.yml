@@ -61,6 +61,8 @@ parameters:
 
 variables:
   - group: Mongo-secrets
+  - name: stripePublishableKeyParam
+    value: ${{ parameters.stripePublishableKey }}
 
 stages:
   # ====== STAGE 1: Build & Push Microservice Images to ACR ======
@@ -233,7 +235,7 @@ stages:
                 fi
                 echo "Stripe publishable key present for client build."
             env:
-              STRIPE_PUBLISHABLE_KEY: ${{ parameters.stripePublishableKey }}
+              STRIPE_PUBLISHABLE_KEY: $(stripePublishableKeyParam)
 
           - task: Bash@3
             displayName: 'Write client .env.production'
@@ -241,17 +243,27 @@ stages:
               targetType: 'inline'
               script: |
                 set -euo pipefail
-                echo "NEXT_PUBLIC_STRIPE_KEY=${{ parameters.stripePublishableKey }}" > client/.env.production
+                echo "NEXT_PUBLIC_STRIPE_KEY=$(stripePublishableKeyParam)" > client/.env.production
                 echo "✓ client/.env.production written"
 
           - task: Docker@2
-            displayName: 'Build and Push Client (Next.js)'
+            displayName: 'Build Client (Next.js)'
             inputs:
-              command: 'buildAndPush'
+              command: 'build'
               repository: 'client'
               dockerfile: 'client/Dockerfile'
               containerRegistry: '${{ parameters.acrServiceConnection }}'
-              arguments: --build-arg NEXT_PUBLIC_STRIPE_KEY=${{ parameters.stripePublishableKey }}
+              arguments: --build-arg NEXT_PUBLIC_STRIPE_KEY=$(stripePublishableKeyParam)
+              tags: |
+                latest
+                $(Build.BuildId)
+
+          - task: Docker@2
+            displayName: 'Push Client (Next.js)'
+            inputs:
+              command: 'push'
+              repository: 'client'
+              containerRegistry: '${{ parameters.acrServiceConnection }}'
               tags: |
                 latest
                 $(Build.BuildId)
