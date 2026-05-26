@@ -54,7 +54,14 @@ MyApp.getInitialProps = async (appContext) => {
   const { data: orderProducts } = await client.get('/api/orders/products');
   const { data: paymentProducts } = await client.get('/api/payments/products');
 
-  const { data: users } = await client.get('/api/users');
+  let users = [];
+  try {
+    const { data: usersData } = await client.get('/api/users');
+    users = usersData;
+  } catch (err) {
+    // If no users exist yet, the user service returns 404; treat as empty list.
+    users = [];
+  }
 
   const { data: bestseller } = await client.get('/api/products/bestseller');
 
