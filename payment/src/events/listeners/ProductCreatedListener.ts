@@ -27,6 +27,12 @@ export class ProductCreatedListener extends Listener<ProductCreatedEvent> {
       isReserved
     } = data;
 
+    const existingProduct = await Product.findById(id);
+    if (existingProduct) {
+      msg.ack();
+      return;
+    }
+
     const product = Product.build({
       id,
       title,

@@ -26,6 +26,12 @@ export class ProductCreatedListener extends Listener<ProductCreatedEvent> {
       rating
     } = data;
 
+    const existingProduct = await Product.findById(id);
+    if (existingProduct) {
+      msg.ack();
+      return;
+    }
+
     const product = Product.build({
       id,
       title,
