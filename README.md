@@ -23,7 +23,6 @@ Refer Architecture Diagram
 - [Demo](#demo)
 - [Features](#features)
 - [Usage](#usage)
-	- [Sign up for an account](#sign-up-for-an-account)
 	- [Purchase products](#purchase-products)
 		- [Pay with Stripe method (recommended)](#pay-with-stripe-method-recommended)
 		- [Pay with the PayPal method](#pay-with-the-paypal-method)
@@ -36,6 +35,7 @@ Refer Architecture Diagram
 - [Setup Kubernetes Secret](#setup-kubernetes-secret)
 - [Deployment](#deployment)
   - [Deploy on Azure (Terraform + Azure DevOps)](#deploy-on-azure-terraform--azure-devops)
+  -  [Sign up for an account](#sign-up-for-an-account)
 - [Technology](#technology)
 - [Disclaimer](#disclaimer)
 
@@ -86,10 +86,6 @@ ecommercewebsite.me's features include:
 [(Back to top)](#table-of-contents)
 
 This readme file provides an overview of the usage of the ecommercewebsite.me website. Here are some instructions on how to use the website's features:
-
-## Sign up for an account
-1. To create an account, visit the [signup page](https://www.ecommercewebsite.me/signup).
-2. Enter your email, password, name, gender, and age (these can be fictional since ecommercewebsite.me is a fictional store).
 
 ## Purchase products
 ### Pay with Stripe method (recommended)
@@ -220,6 +216,10 @@ This deployment uses Terraform for infrastructure provisioning and Azure DevOps 
 2. Use Azure DevOps pipelines to build and push images to ACR.
 3. Deploy manifests to AKS and validate ingress and TLS.
    <img width="1919" height="925" alt="image" src="https://github.com/user-attachments/assets/2d895612-67d2-4f7e-9e87-adac8a64e4d0" />
+
+## Sign up for an account
+1. To create an account, visit the url where you have hosted the website 
+2. Enter your email, password, name, gender, and age (these can be fictional since ecommercewebsite.me is a fictional store).
 
 
 # Technology
