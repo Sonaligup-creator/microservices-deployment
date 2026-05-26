@@ -2,19 +2,18 @@
 
 ![Project Preview](docs/ecommercewebsite.me-shop-banner-1.jpg)
 
+## Screenshots
+
+![Website Screenshot](docs/website-screenshot.png)
+![Pipeline Screenshot](docs/pipeline-screenshot.png)
+
 # ecommercewebsite.me
 
 <!-- Describe your project in brief -->
 
 <!-- [![deploy-manifests](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-manifests.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-manifests.yaml) -->
 
-[![deploy-client](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-client.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-client.yaml)
-[![deploy-user](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-user.yml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-user.yml)
-[![deploy-product](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-product.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-product.yaml)
-[![deploy-order](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-order.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-order.yaml)
-[![deploy-payment](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-payment.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-payment.yaml)
-
-ecommercewebsite.me is a women's clothing e-commerce website that features a fully operational **microservices architecture**. Built on the **Next.js** framework for the client-side, while the server-side is developed with **TypeScript and Express** framework, the website is developed on the **Google Cloud Platform** environment and integrated with automation testing through **GitHub Action** workflows. Deployed on a **DigitalOcean** cluster with a Let's Encrypt certificate, ecommercewebsite.me delivers a secure and seamless shopping experience.
+ecommercewebsite.me is a women's clothing e-commerce website that features a fully operational **microservices architecture**. Built on the **Next.js** framework for the client-side, while the server-side is developed with **TypeScript and Express** framework, this deployment uses **Azure DevOps** pipelines to provision Azure resources and deploy to **Azure Kubernetes Service (AKS)** with **Terraform** as IaC. Terraform reference repo: https://github.com/Sonaligup-creator/Terraform-Infra.
 
 # Table of contents
 
@@ -32,11 +31,10 @@ ecommercewebsite.me is a women's clothing e-commerce website that features a ful
 	- [Add a product to your wishlist](#add-a-product-to-your-wishlist)
 	- [Perform CRUD operations on the product database (create, update, delete)](#perform-crud-operations-on-the-product-database-create-update-delete)
 - [Installation](#installation)
-	- [Running on Google Cloud Platform](#running-on-google-cloud-platform)
 	- [Running on Docker Desktop](#running-on-docker-desktop)
 - [Setup Kubernetes Secret](#setup-kubernetes-secret)
 - [Deployment](#deployment)
-	- [Deploy on DigitalOcean](#deploy-on-digitalocean)
+  - [Deploy on Azure (Terraform + Azure DevOps)](#deploy-on-azure-terraform--azure-devops)
 - [Technology](#technology)
 - [Disclaimer](#disclaimer)
 
@@ -120,78 +118,6 @@ To perform CRUD operations on the product database, you need permission to acces
 # Installation
 
 [(Back to top)](#table-of-contents)
-
-## Running on Google Cloud Platform
-
-[![GCP Badge](https://img.shields.io/badge/-Google_Cloud-4285F4?style=flat&logo=googlecloud&logoColor=white)](https://cloud.google.com/gcp/)
-
-Follow these steps to run the project on Google Cloud Platform:
-
-1. Clone the _cloud_ branch to your local machine.
-
-2. Install [Node.js](https://nodejs.org/en/), [Skaffold](https://skaffold.dev/), [Docker](https://www.docker.com/), and [kubectl](https://kubernetes.io/docs/tasks/tools/).
-
-3. Sign up for a free account with $300 on GCP and create a Docker Hub account.
-
-4. Run the `setup.sh` script by executing the following command in the root directory of this project:
-
-```sh
-source setup.sh
-```
-
-The script will prompt you to enter your Docker registry account name and will build and push the Docker images for each folder that contains a `Dockerfile`.
-
-5. Create a new project on GCP and enable _Kubernetes Engine API_ and _Cloud Build API_. After successfully enabling API services, grant permission for the _Cloud Build_ service account permission on _Cloud Build API_.
-
-6. Create a new Kubernetes cluster with the minimum resource of 3 nodes (recommended) and select the region closest to your location.
-
-7. Install [GCP SDK](https://cloud.google.com/sdk/docs/install-sdk) to connect our images to the GCP cluster context. (Learn how to install Google Cloud SDK on macOS [here](https://stackoverflow.com/questions/31037279/gcloud-command-not-found-while-installing-google-cloud-sdk))
-
-8. Open the Google Cloud SDK and log in. Initiate and then choose the correct options to proceed by running the following commands:
-
-```
-gcloud auth login
-gcloud init
-```
-
-9. Create a Kubernetes context on your desktop by running this command (replace `<YOUR_CLUSTER_NAME>` with the name of the cluster you created on GCP):
-
-```
-gcloud container clusters get-credentials <YOUR_CLUSTER_NAME>
-```
-
-10. See the list of contexts and then select a new context by running these commands:
-
-```
-kubectl config get-contexts
-kubectl config use-context <CONTEXT_NAME>
-```
-
-11. Install [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/#quick-start) and [ingress-nginx for GCP](https://kubernetes.github.io/ingress-nginx/deploy/#gce-gke).
-
-12. Find your load balancing port, which GCP automatically generated, in the _Network Services_ tab in GCP.
-
-13. For _Windows_ users, open the host file at `C:\Windows\System32\drivers\etc\hosts`. For _Mac_ users, open the host file at `\etc\hosts`. Then, edit the file by adding `YOUR_LOAD_BALANCING_PORT YOUR_CUSTOM_URL` and save as an administrator (e.g., `56.125.456.45 custom.com`).
-
-14. Configure all the YAML files to match your GCP project ID.
-
-15. Create all [Kubernetes secrets](#setup-env).
-
-16. Run the following command and authenticate the GCP account via a web browser:
-
-```
-gcloud auth application-default login
-```
-
-17. Ensure that you are using the correct context before running this command at the root directory:
-
-```
-skaffold dev
-```
-
-18. Open a web browser and enter your custom URL with `https://` to see the project come to life
-
-Please note that the `setup.sh` script is designed to streamline the installation process by automatically building and pushing Docker images for each folder that contains a `Dockerfile`. This helps simplify the steps required to set up the project on GCP.
 
 ## Running on Docker Desktop
 
@@ -285,176 +211,13 @@ kubectl create secret generic paypal-secret --from-literal=PAYPAL_CLIENT_ID=<YOU
 
 [(Back to top)](#table-of-contents)
 
-## Deploy on DigitalOcean
+## Deploy on Azure (Terraform + Azure DevOps)
 
-[![DigitalOcean](https://img.shields.io/badge/DigitalOcean-0080FF?style=flat&logo=digitalocean&logoColor=white)](https://www.digitalocean.com/)
+This deployment uses Terraform for infrastructure provisioning and Azure DevOps pipelines for image builds and AKS deployments.
 
-1. sign up a free account with a $200 for 60 days trial and create a Kubernetes cluster in a new project on Digital Ocean
-
-2. generate a new access token on Digital Ocean to connect with Digital Ocean via doctl, go to the _API_ menu then click _generate a new token_, set expiration date and enable both read and write scopes, copy the _token code_ for use in the next step
-
-3. install [doctl](https://docs.digitalocean.com/reference/doctl/how-to/install/) and [kubectl](https://kubernetes.io/docs/tasks/tools/), then run
-```
-doctl auth init --access-token <API_TOKEN_CODE>
-```
-
-4. connect with Digital Ocean k8s cluster context by running this command and authorize with your credentials
-```
-doctl kubernetes cluster kubeconfig save <YOUR_CLUSTER_NAME>
-``` 
-
-5. switch Kubernetes context to the new context by running
-```
-kubectl config use-context <CONTEXT_NAME>
-```
-
-6. setup all Kubernetes secrets following [this step](#setup-kubernetes-secret)
-
-7. create _GitHub _workflow_ for building an initial docker image on push event at the _main_ branch and perform automated testing in every service on pull request event trigger with trying to merge with the _main_ branch
-
-```
-name: deploy-client
-
-on:
-  push:
-    # watch for pull request into main branch
-    branches:
-      - main
-
-    # watch for changes in client folder
-    paths:
-      - "client/**"
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      # build an image
-      - run: cd client && docker build -t <YOUR_ACCOUNT_NAME>/<YOUR_IMAGE_NAME> .
-
-      # login on docker hub
-      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
-      # push an image to docker hub
-      - run: docker push <YOUR_ACCOUNT_NAME>/<YOUR_IMAGE_NAME>
-```
-
-8. generate another new access token on Digital Ocean for authentication via GitHub Action, go to the _API_ menu then click _generate a new token_, set expiration date and enable both read and write scopes, copy the _token code_ for use in the next step as a `DIGITALOCEAN_ACCESS_TOKEN` 
-
-9. add GitHub action secrets for _docker credentials_ and _digitalocean access token key_ at the security setting in the repository
-```
-DIGITALOCEAN_ACCESS_TOKEN = 
-DOCKER_USERNAME = 
-DOCKER_PASSWORD = 
-```
-
-10. edit files in every service then commit code to the _main_ branch for triggering **Github Action workflows** to build and push all images to your Docker Hub
-
-11. install [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/#digital-ocean) to automatically create **DigitalOcean Load Balancer**
-
-12. separate k8s folder to k8s-dev and k8s-prod then copy `ingress-srv.yaml` file to both folders and edit the host URL to a new domain name
-
-13. create a GitHub workflow for telling the Kubernetes cluster to use images we built by adding these lines
-
-```
-- uses: digitalocean/action-doctl@v2
-  with:
-    token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-- run: doctl kubernetes cluster kubeconfig save <YOUR_CLUSTER_NAME>
-- run: kubectl rollout restart deployment <YOUR_DEPLOYMENT_NAME>
-```
-
-14. purchase a domain name with a promotion that can be very cheap as $1 for the 1st year such as Namecheap, Porkbun, or Dynadot
-
-15. config custom domain name nameserver with your domain name registration website by custom adding these lines
-```
-ns1.digitalocean.com
-ns2.digitalocean.com
-ns3.digitalocean.com
-```
-
-16. add a domain name in the Digital Ocean at networking tab then create a new record
-
-```
-// A record
-HOSTNAME: @
-WILL DIRECT TO: <YOUR_LOAD_BALANCER>
-TTL: 30
-
-// CNAME record
-HOSTNAME: www
-IN AN ALIAS OF: @
-TTL: 30
-```
-
-17. add your cluster name at `deploy-manifests.yaml` file then redo step 7. again
-
-```
-name: deploy-manifests
-
-on:
-  push:
-    # watch for pull request into main branch
-    branches:
-      - main
-
-    # watch for changes in infra folder
-    paths:
-      - "infra/**"
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      # use and cliententicate doctl
-      - uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      # use and cliententicate doctl
-      - run: doctl kubernetes cluster kubeconfig save <YOUR_CLUSTER_NAME>
-
-      # apply deployment yaml files (k8s-prod is for production!)
-      - run: kubectl apply -f infra/k8s && kubectl apply -f infra/k8s-prod
-```
-
-18. change `do-loadbalancer-hostname` and `host` at file `infra/k8s-prod/ingress-srv.yaml` to your domain name
-
-19. change the URL in `client/api/build-client.js` to your domain name
-
-20. after that, we will follow step 4 of this guide [How to Set Up an Nginx Ingress with Cert-Manager on DigitalOcean Kubernetes](https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes) to make our website ready for **HTTPS** requests with the certificate issued by **Let's encrypt**
-
-21. begin with installing the _cert-manager_ namespace by running the command
-```
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.7.1/cert-manager.yaml
-```
-
-22. change your directory to `infra/issuer/` there will be 2 files that you need to change the _email_ and _name of a secret key_ as you wish then run the command
-```
-kubectl create -f staging_issuer.yaml
-``` 
-```
-kubectl create -f production_issuer.yaml
-```
-
-23. at file `infra/k8s-prod/ingress-srv.yaml` change _cert-manager.io/cluster-issuer_ to `"letsencrypt-staging"` then run this command at `infra/k8s-prod/` directory
-```
-kubectl apply -f ingress-srv.yaml
-```
-
-24. then change _cert-manager.io/cluster-issuer_ back to `"letsencrypt-prod"` and run this command at `infra/k8s-prod/` directory
-```
-kubectl apply -f ingress-srv.yaml
-```
-
-25. waiting around 2-15 minutes for setting up then browse your website with **HTTPS** protocol
+1. Provision Azure infrastructure with Terraform: https://github.com/Sonaligup-creator/Terraform-Infra
+2. Use Azure DevOps pipelines to build and push images to ACR.
+3. Deploy manifests to AKS and validate ingress and TLS.
 
 # Technology
 
@@ -468,7 +231,10 @@ This project is built using the following technologies:
 - [MongoDB](https://www.mongodb.com/)
 - [Docker](https://www.docker.com/)
 - [Kubernetes](https://kubernetes.io/)
-- [Github Action](https://github.com/features/actions)
+- [Azure DevOps](https://azure.microsoft.com/products/devops/)
+- [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/products/kubernetes-service/)
+- [Azure Container Registry (ACR)](https://azure.microsoft.com/products/container-registry/)
+- [Terraform](https://www.terraform.io/)
 - [NATS Streaming Server](https://docs.nats.io/nats-streaming-concepts/intro)
 - [Skaffold](https://skaffold.dev/)
 - [NPM package](https://www.npmjs.com/)
