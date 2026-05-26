@@ -221,6 +221,8 @@ This deployment uses Terraform for infrastructure provisioning and Azure DevOps 
 ## Sign up for an account
 1. To create an account, visit the url where you have hosted the website 
 2. Enter your email, password, name, gender, and age (these can be fictional since ecommercewebsite.me is a fictional store).
+   <img width="1919" height="936" alt="image" src="https://github.com/user-attachments/assets/04adf08f-c14f-46fd-baa2-aedb81ba587c" />
+
    <img width="1919" height="961" alt="image" src="https://github.com/user-attachments/assets/b876030d-98fc-4a2b-9e5c-352b14399555" />
 
 
