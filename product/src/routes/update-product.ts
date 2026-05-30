@@ -5,7 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   adminUser
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Product } from '../models/product';
 import { ProductUpdatedPublisher } from '../events/publishers/ProductUpdatedPublisher';
@@ -103,3 +103,4 @@ router.patch(
 );
 
 export { router as updateProductRouter };
+

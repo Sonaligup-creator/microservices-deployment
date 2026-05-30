@@ -4,7 +4,7 @@ import {
   Subjects,
   QueueGroupNames,
   OrderStatus
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 import { type Message } from 'node-nats-streaming';
 
 import { Order } from '../../models/order';
@@ -40,3 +40,4 @@ export class OrderUpdatedListener extends Listener<OrderUpdatedEvent> {
     msg.ack();
   }
 }
+

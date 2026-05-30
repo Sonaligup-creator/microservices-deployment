@@ -9,7 +9,7 @@
 
 <!-- Describe your project in brief -->
 
-<!-- [![deploy-manifests](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-manifests.yaml/badge.svg)](https://github.com/thasup/microservices-ecommerce/actions/workflows/deploy-manifests.yaml) -->
+<!-- [![deploy-manifests](https://github.com/ecommerce/microservices-ecommerce/actions/workflows/deploy-manifests.yaml/badge.svg)](https://github.com/ecommerce/microservices-ecommerce/actions/workflows/deploy-manifests.yaml) -->
 
 ecommercewebsite.me is a women's clothing e-commerce website that features a fully operational **microservices architecture**. Built on the **Next.js** framework for the client-side, while the server-side is developed with **TypeScript and Express** framework, this deployment uses **Azure DevOps** pipelines to provision Azure resources and deploy to **Azure Kubernetes Service (AKS)** with **Terraform** as IaC. Terraform reference repo: https://github.com/Sonaligup-creator/Terraform-Infra.
 
@@ -251,4 +251,5 @@ This project is built using the following technologies:
 [(Back to top)](#table-of-contents)
 
 All images used in this project are for educational purposes only. 
+
 

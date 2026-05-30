@@ -4,7 +4,7 @@ import {
   Listener,
   type ProductDeletedEvent,
   QueueGroupNames
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Product } from '../../models/product';
 
@@ -26,3 +26,4 @@ export class ProductDeletedListener extends Listener<ProductDeletedEvent> {
     msg.ack();
   }
 }
+

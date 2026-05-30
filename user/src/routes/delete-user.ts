@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import { param } from 'express-validator';
-import { NotFoundError, validateRequest } from '@thasup-dev/common';
+import { NotFoundError, validateRequest } from '@ecommerce/common';
 
 import { User } from '../models/user';
 
@@ -25,3 +25,4 @@ router.delete(
 );
 
 export { router as deleteUserRouter };
+

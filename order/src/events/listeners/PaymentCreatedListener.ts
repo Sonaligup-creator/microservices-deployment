@@ -4,7 +4,7 @@ import {
   type PaymentCreatedEvent,
   OrderStatus,
   QueueGroupNames
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 import { type Message } from 'node-nats-streaming';
 
 import { Order } from '../../models/order';
@@ -50,3 +50,4 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
     msg.ack();
   }
 }
+

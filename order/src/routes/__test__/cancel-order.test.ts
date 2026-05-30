@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { OrderStatus } from '@thasup-dev/common';
+import { OrderStatus } from '@ecommerce/common';
 
 import { app } from '../../app';
 import { Product } from '../../models/product';
@@ -118,3 +118,4 @@ it('emits a order updated event', async () => {
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
+

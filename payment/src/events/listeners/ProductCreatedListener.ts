@@ -4,7 +4,7 @@ import {
   Listener,
   type ProductCreatedEvent,
   QueueGroupNames
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Product } from '../../models/product';
 
@@ -52,3 +52,4 @@ export class ProductCreatedListener extends Listener<ProductCreatedEvent> {
     msg.ack();
   }
 }
+

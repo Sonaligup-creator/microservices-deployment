@@ -5,7 +5,7 @@ import { app } from '../../app';
 import { Product } from '../../models/product';
 import { Order } from '../../models/order';
 import { natsWrapper } from '../../NatsWrapper';
-import { OrderStatus } from '@thasup-dev/common';
+import { OrderStatus } from '@ecommerce/common';
 import type { ProductDoc } from '../../types/product';
 import type { CartAttrs, ShippingAddressAttrs } from '../../types/order';
 
@@ -209,3 +209,4 @@ it('emits a order updated event', async () => {
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
+

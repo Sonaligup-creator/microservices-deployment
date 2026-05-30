@@ -1,7 +1,7 @@
 import express from 'express';
 import 'express-async-errors';
 import cookieSession from 'cookie-session';
-import { NotFoundError, errorHandler } from '@thasup-dev/common';
+import { NotFoundError, errorHandler } from '@ecommerce/common';
 
 import { currentUserRouter } from './routes/current-user';
 import { signinRouter } from './routes/signin';
@@ -36,3 +36,4 @@ app.all('*', async (req, res) => {
 app.use(errorHandler);
 
 export { app };
+

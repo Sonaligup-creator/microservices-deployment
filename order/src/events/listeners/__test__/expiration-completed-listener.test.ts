@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { type Message } from 'node-nats-streaming';
-import { OrderStatus, type ExpirationCompletedEvent } from '@thasup-dev/common';
+import { OrderStatus, type ExpirationCompletedEvent } from '@ecommerce/common';
 
 import { ExpirationCompletedListener } from '../ExpirationCompletedListener';
 import { natsWrapper } from '../../../NatsWrapper';
@@ -90,3 +90,4 @@ it('ack the message', async () => {
 
   expect(msg.ack).toHaveBeenCalled();
 });
+

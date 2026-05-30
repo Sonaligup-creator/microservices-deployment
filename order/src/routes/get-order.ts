@@ -5,7 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   validateRequest
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Order } from '../models/order';
 
@@ -39,3 +39,4 @@ router.get(
 );
 
 export { router as getOrderRouter };
+

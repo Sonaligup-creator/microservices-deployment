@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from 'express';
-import { currentUser } from '@thasup-dev/common';
+import { currentUser } from '@ecommerce/common';
 
 const router = express.Router();
 
@@ -8,3 +8,4 @@ router.get('/api/users/currentuser', currentUser, (req: Request, res: Response) 
 });
 
 export { router as currentUserRouter };
+

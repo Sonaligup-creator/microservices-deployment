@@ -4,7 +4,7 @@ import {
   OrderStatus,
   QueueGroupNames,
   Subjects
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 import { type Message } from 'node-nats-streaming';
 
 import { Order } from '../../models/order';
@@ -51,3 +51,4 @@ export class ExpirationCompletedListener extends Listener<ExpirationCompletedEve
     msg.ack();
   }
 }
+

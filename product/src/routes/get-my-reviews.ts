@@ -1,4 +1,4 @@
-import { requireAuth } from '@thasup-dev/common';
+import { requireAuth } from '@ecommerce/common';
 import express, { type Request, type Response } from 'express';
 
 import { Review } from '../models/review';
@@ -20,3 +20,4 @@ router.get(
 );
 
 export { router as getMyReviewsRouter };
+

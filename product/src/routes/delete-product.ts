@@ -5,7 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   validateRequest
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Product } from '../models/product';
 import { ProductDeletedPublisher } from '../events/publishers/ProductDeletedPublisher';
@@ -40,3 +40,4 @@ router.delete(
 );
 
 export { router as deleteProductRouter };
+

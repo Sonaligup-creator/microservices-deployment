@@ -71,7 +71,7 @@ const CreateProduct = () => {
 		}
 
 		if (src[0] === 'v') {
-			return `https://res.cloudinary.com/thasup/image/upload/q_${quality || 60}/${src}`;
+			return `https://res.cloudinary.com/ecommerce/image/upload/q_${quality || 60}/${src}`;
 		}
 
 		return `https://www.dropbox.com/s/${src}?raw=1&q=${quality || 70}`;
@@ -303,3 +303,4 @@ const CreateProduct = () => {
 };
 
 export default CreateProduct;
+

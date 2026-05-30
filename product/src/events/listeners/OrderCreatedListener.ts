@@ -3,7 +3,7 @@ import {
   type OrderCreatedEvent,
   Subjects,
   QueueGroupNames
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 import { type Message } from 'node-nats-streaming';
 
 import { Product } from '../../models/product';
@@ -75,3 +75,4 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
     msg.ack();
   }
 }
+

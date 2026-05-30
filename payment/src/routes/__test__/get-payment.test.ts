@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { OrderStatus } from '@thasup-dev/common';
+import { OrderStatus } from '@ecommerce/common';
 
 import { app } from '../../app';
 import { Order } from '../../models/order';
@@ -97,3 +97,4 @@ it('returns 200 if the payment has found', async () => {
   expect(fetchedPayment[0]).toBeDefined();
   expect(fetchedPayment[0].orderId).toEqual(order.id);
 });
+

@@ -15,7 +15,7 @@ spec:
       containers:
         - name: payment
           # uncomment this if you want to run on docker desktop
-          image: thasup/payment
+          image: ecommerce/payment
           # uncomment this if you want to run on google cloud platform
           # image: us.gcr.io/ecommercewebsite.me-shop-367317/payment
           env:
@@ -61,3 +61,4 @@ spec:
       protocol: TCP
       port: 3000
       targetPort: 3000
+

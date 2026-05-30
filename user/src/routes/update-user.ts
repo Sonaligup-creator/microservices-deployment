@@ -5,7 +5,7 @@ import {
   validateRequest,
   NotFoundError,
   BadRequestError
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { User } from '../models/user';
 import { Password } from '../services/Password';
@@ -108,3 +108,4 @@ router.patch(
 );
 
 export { router as updateUserRouter };
+

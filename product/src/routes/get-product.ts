@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import { param } from 'express-validator';
-import { NotFoundError, validateRequest } from '@thasup-dev/common';
+import { NotFoundError, validateRequest } from '@ecommerce/common';
 
 import { Product } from '../models/product';
 
@@ -22,3 +22,4 @@ router.get(
 );
 
 export { router as getProductRouter };
+

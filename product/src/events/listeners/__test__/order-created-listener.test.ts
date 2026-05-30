@@ -1,6 +1,6 @@
 import { type Message } from 'node-nats-streaming';
 import mongoose from 'mongoose';
-import { type OrderCreatedEvent, OrderStatus } from '@thasup-dev/common';
+import { type OrderCreatedEvent, OrderStatus } from '@ecommerce/common';
 
 import { OrderCreatedListener } from '../OrderCreatedListener';
 import { Product } from '../../../models/product';
@@ -107,3 +107,4 @@ it('publishes a product updated event', async () => {
 
   expect(productUpdatedData.isReserved).toEqual(true);
 });
+

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import { OrderStatus } from '@thasup-dev/common';
+import { OrderStatus } from '@ecommerce/common';
 
 import type { OrderAttrs, OrderDoc, OrderModel } from '../types/order';
 
@@ -104,3 +104,4 @@ orderSchema.statics.build = (attrs: OrderAttrs) => {
 const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema);
 
 export { Order };
+

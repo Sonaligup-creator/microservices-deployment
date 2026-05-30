@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import { body } from 'express-validator';
-import { adminUser, requireAuth, validateRequest } from '@thasup-dev/common';
+import { adminUser, requireAuth, validateRequest } from '@ecommerce/common';
 
 import { Product } from '../models/product';
 import { ProductCreatedPublisher } from '../events/publishers/ProductCreatedPublisher';
@@ -94,3 +94,4 @@ router.post(
 );
 
 export { router as createProductRouter };
+

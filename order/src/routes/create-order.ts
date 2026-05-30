@@ -5,7 +5,7 @@ import {
   OrderStatus,
   requireAuth,
   validateRequest
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Order } from '../models/order';
 import { natsWrapper } from '../NatsWrapper';
@@ -120,3 +120,4 @@ router.post(
 );
 
 export { router as createOrderRouter };
+

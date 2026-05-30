@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v2
 
       # build an image
-      - run: cd payment && docker build -t thasup/payment .
+      - run: cd payment && docker build -t ecommerce/payment .
 
       # login on docker hub
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
@@ -29,4 +29,5 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
       # push an image to docker hub
-      - run: docker push thasup/payment
+      - run: docker push ecommerce/payment
+

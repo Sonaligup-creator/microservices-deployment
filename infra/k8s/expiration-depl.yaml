@@ -15,7 +15,7 @@ spec:
       containers:
         - name: expiration
           # uncomment this if you want to run on docker desktop
-          image: thasup/expiration
+          image: ecommerce/expiration
           # uncomment this if you want to run on google cloud platform
           # image: us.gcr.io/ecommercewebsite.me-shop-367317/expiration
           env:
@@ -29,3 +29,4 @@ spec:
               value: my-covid-cluster
             - name: REDIS_HOST
               value: expiration-redis-srv
+

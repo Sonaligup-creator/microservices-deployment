@@ -178,7 +178,7 @@ const Footer = () => {
 								Copyright &copy; {currentYear}
 								<span className="ms-2">
 									<Link href="https://thanachon.me" passHref>
-										<a target="_blank">THASUP</a>
+										<a target="_blank">ecommerce</a>
 									</Link>
 								</span>
 							</Col>
@@ -191,3 +191,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

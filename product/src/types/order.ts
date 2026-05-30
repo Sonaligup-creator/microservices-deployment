@@ -1,5 +1,5 @@
 import type mongoose from 'mongoose';
-import { type OrderStatus } from '@thasup-dev/common';
+import { type OrderStatus } from '@ecommerce/common';
 
 export interface CartAttrs {
   userId: string
@@ -67,3 +67,4 @@ export interface OrderDoc extends mongoose.Document {
   createdAt: string
   updatedAt: string
 }
+

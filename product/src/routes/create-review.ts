@@ -5,7 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   validateRequest
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Product } from '../models/product';
 import { Review } from '../models/review';
@@ -107,3 +107,4 @@ router.post(
 );
 
 export { router as createReviewRouter };
+

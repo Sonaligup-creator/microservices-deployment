@@ -1,6 +1,6 @@
 import { type Message } from 'node-nats-streaming';
 import mongoose from 'mongoose';
-import { type OrderUpdatedEvent, OrderStatus } from '@thasup-dev/common';
+import { type OrderUpdatedEvent, OrderStatus } from '@ecommerce/common';
 import { OrderUpdatedListener } from '../OrderUpdatedListener';
 import { Product } from '../../../models/product';
 import { natsWrapper } from '../../../NatsWrapper';
@@ -103,3 +103,4 @@ it('publishes a product updated event', async () => {
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
+

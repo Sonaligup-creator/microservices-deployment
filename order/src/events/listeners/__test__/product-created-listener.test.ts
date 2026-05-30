@@ -1,6 +1,6 @@
 import { type Message } from 'node-nats-streaming';
 import mongoose from 'mongoose';
-import { type ProductCreatedEvent } from '@thasup-dev/common';
+import { type ProductCreatedEvent } from '@ecommerce/common';
 
 import { ProductCreatedListener } from '../ProductCreatedListener';
 import { Product } from '../../../models/product';
@@ -67,3 +67,4 @@ it('acks the message', async () => {
   // write assertions to make sure ack function is called
   expect(msg.ack).toHaveBeenCalled();
 });
+

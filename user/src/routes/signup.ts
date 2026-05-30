@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
-import { BadRequestError, validateRequest } from '@thasup-dev/common';
+import { BadRequestError, validateRequest } from '@ecommerce/common';
 import { createAvatar } from '@dicebear/core';
 import { thumbs } from '@dicebear/collection';
 
@@ -91,3 +91,4 @@ router.post(
 );
 
 export { router as signupRouter };
+

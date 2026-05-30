@@ -1,5 +1,5 @@
 import type mongoose from 'mongoose';
-import { type OrderStatus } from '@thasup-dev/common';
+import { type OrderStatus } from '@ecommerce/common';
 
 // An interface that describes the properties
 // that are requried to create a new Order
@@ -40,3 +40,4 @@ export interface OrderDoc extends mongoose.Document {
   createdAt: string
   updatedAt: string
 }
+

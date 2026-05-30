@@ -495,12 +495,12 @@ stages:
                     continue
                   fi
                   
-                  sed -i "s|thasup/product|${{ parameters.acrLoginServer }}/product:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/order|${{ parameters.acrLoginServer }}/order:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/payment|${{ parameters.acrLoginServer }}/payment:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/user|${{ parameters.acrLoginServer }}/user:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/expiration|${{ parameters.acrLoginServer }}/expiration:$(Build.BuildId)|g" "$file"
-                  sed -i "s|thasup/client|${{ parameters.acrLoginServer }}/client:$(Build.BuildId)|g" "$file"
+                  sed -i "s|ecommerce/product|${{ parameters.acrLoginServer }}/product:$(Build.BuildId)|g" "$file"
+                  sed -i "s|ecommerce/order|${{ parameters.acrLoginServer }}/order:$(Build.BuildId)|g" "$file"
+                  sed -i "s|ecommerce/payment|${{ parameters.acrLoginServer }}/payment:$(Build.BuildId)|g" "$file"
+                  sed -i "s|ecommerce/user|${{ parameters.acrLoginServer }}/user:$(Build.BuildId)|g" "$file"
+                  sed -i "s|ecommerce/expiration|${{ parameters.acrLoginServer }}/expiration:$(Build.BuildId)|g" "$file"
+                  sed -i "s|ecommerce/client|${{ parameters.acrLoginServer }}/client:$(Build.BuildId)|g" "$file"
                 done
                 echo "✓ Manifests updated with ACR images"
 
@@ -555,7 +555,7 @@ stages:
                 echo "Validating rewritten image references..."
                 echo "Expected registry: ${{ parameters.acrLoginServer }}"
 
-                if grep -RIn "thasup/" infra/k8s/*-depl.yaml; then
+                if grep -RIn "ecommerce/" infra/k8s/*-depl.yaml; then
                   echo "##vso[task.logissue type=error]Placeholder image references still exist in manifests."
                   exit 1
                 fi
@@ -760,3 +760,4 @@ stages:
                       fi
 
                       echo "No Ingress IP/hostname found yet. Use: kubectl get ingress -n ${ns}"
+

@@ -5,7 +5,7 @@ import {
   type ProductUpdatedEvent,
   NotFoundError,
   QueueGroupNames
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Product } from '../../models/product';
 
@@ -52,3 +52,4 @@ export class ProductUpdatedListener extends Listener<ProductUpdatedEvent> {
     msg.ack();
   }
 }
+

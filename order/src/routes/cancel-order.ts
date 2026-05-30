@@ -5,7 +5,7 @@ import {
   OrderStatus,
   requireAuth,
   validateRequest
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 import { param } from 'express-validator';
 
 import { Order } from '../models/order';
@@ -58,3 +58,4 @@ router.patch(
 );
 
 export { router as cancelOrderRouter };
+

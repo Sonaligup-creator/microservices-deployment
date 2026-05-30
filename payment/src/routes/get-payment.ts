@@ -4,7 +4,7 @@ import {
   NotFoundError,
   validateRequest,
   NotAuthorizedError
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 import { param } from 'express-validator';
 import { Payment } from '../models/payment';
 import { Order } from '../models/order';
@@ -42,3 +42,4 @@ router.get(
 );
 
 export { router as getPaymentRouter };
+

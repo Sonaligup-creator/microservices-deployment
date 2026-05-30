@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { OrderStatus } from '@thasup-dev/common';
+import { OrderStatus } from '@ecommerce/common';
 
 import { app } from '../../app';
 import { Order } from '../../models/order';
@@ -127,3 +127,4 @@ it('returns a 201 with valid inputs', async () => {
 
   expect(payment).not.toBeNull();
 });
+

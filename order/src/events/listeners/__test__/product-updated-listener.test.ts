@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { type Message } from 'node-nats-streaming';
-import { type ProductUpdatedEvent } from '@thasup-dev/common';
+import { type ProductUpdatedEvent } from '@ecommerce/common';
 
 import { ProductUpdatedListener } from '../ProductUpdatedListener';
 import { natsWrapper } from '../../../NatsWrapper';
@@ -95,3 +95,4 @@ it('does not call ack if the event has a skipped version number', async () => {
 
   expect(msg.ack).not.toHaveBeenCalled();
 });
+

@@ -24,7 +24,7 @@ echo "  → Applying Expiration service (Redis)..."
 kubectl apply -f "$K8S_DIR/expiration-redis-depl.yaml" -n $NAMESPACE
 kubectl apply -f "$K8S_DIR/expiration-depl.yaml" -n $NAMESPACE
 
-# Deploy microservices (use ACR images, not placeholder thasup/*)
+# Deploy microservices (use ACR images, not placeholder ecommerce/*)
 echo ""
 echo "Applying microservices deployments..."
 echo "  NOTE: Update image names to your ACR in *.yaml before applying"
@@ -62,3 +62,4 @@ echo ""
 echo "Check service status:"
 echo "  kubectl get deployments -n $NAMESPACE"
 echo "  kubectl get pods -n $NAMESPACE"
+

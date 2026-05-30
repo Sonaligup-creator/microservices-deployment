@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { type Message } from 'node-nats-streaming';
-import { OrderStatus, type OrderUpdatedEvent } from '@thasup-dev/common';
+import { OrderStatus, type OrderUpdatedEvent } from '@ecommerce/common';
 
 import { OrderUpdatedListener } from '../OrderUpdatedListener';
 import { natsWrapper } from '../../../NatsWrapper';
@@ -86,3 +86,4 @@ it('acks the message', async () => {
 
   expect(msg.ack).toHaveBeenCalled();
 });
+

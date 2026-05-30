@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from 'express';
-import { NotFoundError } from '@thasup-dev/common';
+import { NotFoundError } from '@ecommerce/common';
 
 import { User } from '../models/user';
 
@@ -16,3 +16,4 @@ router.get('/api/users', async (req: Request, res: Response) => {
 });
 
 export { router as getUsersRouter };
+

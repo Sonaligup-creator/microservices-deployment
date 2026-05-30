@@ -1,4 +1,4 @@
-import { NotFoundError } from '@thasup-dev/common';
+import { NotFoundError } from '@ecommerce/common';
 import express, { type Request, type Response } from 'express';
 
 import { Product } from '../models/product';
@@ -16,3 +16,4 @@ router.get('/api/products/bestseller', async (req: Request, res: Response) => {
 });
 
 export { router as bestsellerRouter };
+

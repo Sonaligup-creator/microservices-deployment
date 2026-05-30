@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from 'express';
 import {
   requireAuth
-} from '@thasup-dev/common';
+} from '@ecommerce/common';
 
 import { Order } from '../models/order';
 
@@ -22,3 +22,4 @@ router.get(
 );
 
 export { router as showMyOrderRouter };
+
