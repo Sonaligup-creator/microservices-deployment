@@ -8,11 +8,11 @@ export interface ProductCreatedEvent {
     price: number;
     userId: string;
     image: string;
-    colors: string[];
-    sizes: string[];
-    brand: string;
+    colors?: string | string[];
+    sizes?: string | string[];
+    brand?: string;
     category: string;
-    material: string;
+    material?: string;
     description: string;
     numReviews: number;
     rating: number;
